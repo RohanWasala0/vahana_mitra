@@ -1,0 +1,58 @@
+[project]
+name = "vahanamitra"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10.0"
+dependencies = [
+  "Flask>=3.0,<4.0",
+  "Flask-SQLAlchemy>=3.1,<4.0",
+  "Flask-Migrate>=4.0,<5.0",
+  "SQLAlchemy>=2.0,<3.0",
+  "psycopg[binary]>=3.2,<4.0", "python-dotenv>=1.0,<2.0", "gunicorn>=22.0,<23.0", ]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.0",
+  "black>=24.0",
+  "flake8>=7.0",
+  "mypy>=1.8",
+]
+
+[build-system]
+# uv build backend (official docs recommend an upper bound)
+requires = ["uv_build>=0.9.26,<0.10.0"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+# Our importable package is `app` under `src/`
+module-name = "app"
+module-root = "src"
+# Include templates/static in distributions (wheel/sdist)
+data = [
+  "src/app/templates",
+  "src/app/static",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+filterwarnings = [
+  "error::DeprecationWarning:app.*",
+  "error::DeprecationWarning:tests.*",
+]
+
+[tool.black]
+line-length = 88
+target-version = ["py310"]
+
+[tool.mypy]
+python_version = "3.10.0"
+strict = true
+pretty = true
+show_error_codes = true
+warn_unused_configs = true
+files = ["src", "tests"]
+
+# Flask ecosystem typing is uneven; keep strict for *your* code while not failing on third-party imports.
+ignore_missing_imports = true
