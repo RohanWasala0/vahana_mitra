@@ -3,20 +3,33 @@ name = "vahanamitra"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.10.0"
+requires-python = ">=3.13.0"
 dependencies = [
-  "Flask>=3.0,<4.0",
-  "Flask-SQLAlchemy>=3.1,<4.0",
-  "Flask-Migrate>=4.0,<5.0",
-  "SQLAlchemy>=2.0,<3.0",
-  "psycopg[binary]>=3.2,<4.0", "python-dotenv>=1.0,<2.0", "gunicorn>=22.0,<23.0", ]
+  "flask>=3.0,<4.0",
+  "flask-sqlalchemy>=3.1,<4.0",
+  "flask-migrate>=4.0,<5.0",
+  "sqlalchemy>=2.0,<3.0",
+  "psycopg[binary]>=3.2,<4.0",
+  "python-dotenv>=1.0,<2.0",
+  "gunicorn>=22.0,<23.0",
+  "flask-admin>=2.0.2",
+]
 
 [dependency-groups]
 dev = [
   "pytest>=8.0",
-  "black>=24.0",
-  "flake8>=7.0",
-  "mypy>=1.8",
+  "python-dotenv>=1.2.1",
+]
+format = [
+    "black>=26.1.0",
+    "ruff>=0.15.2",
+]
+lint = [
+    "flake8>=7.3.0",
+    "flake8-bugbear>=25.11.29",
+]
+type = [
+    "mypy>=1.19.1",
 ]
 
 [build-system]
@@ -44,15 +57,36 @@ filterwarnings = [
 
 [tool.black]
 line-length = 88
-target-version = ["py310"]
+target-version = ["py313"]
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E203", "W503"]
+select = ["E", "F", "W", "B"]
+exclude = [
+  ".venv",
+  "migrations",
+  "__pycache__",
+  "build",
+  "dist",
+]
 
 [tool.mypy]
-python_version = "3.10.0"
-strict = true
-pretty = true
-show_error_codes = true
+python_version = "3.13.0"
 warn_unused_configs = true
-files = ["src", "tests"]
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+no_implicit_optional = true
+check_untyped_defs = true
+warn_return_any = true
+warn_unused_ignores = true
+strict_equality = true
 
-# Flask ecosystem typing is uneven; keep strict for *your* code while not failing on third-party imports.
+# Third-party libs may have partial typing; keep core strictness but avoid noise.
+[[tool.mypy.overrides]]
+module = [
+  "flask_migrate.*",
+  "flask_sqlalchemy.*",
+]
 ignore_missing_imports = true
+

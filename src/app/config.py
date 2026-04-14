@@ -2,53 +2,65 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
-from typing import Any, Mapping
-
-from flask import Flask
-from sqlalchemy.pool import StaticPool
+from pathlib import Path
 
 
-def _env(name: str) -> str | None:
-    value = os.getenv(name)
-    if value is not None and value.strip() == "":
-        return None
-    return value
+def resolve_environment(config_name: str | None) -> str:
+    """
+    Resolve environment name.
+
+    Priority:
+      1) explicit arg
+      2) APP_ENV
+      3) FLASK_ENV (legacy-compatible)
+      4) default: development
+    """
+    if config_name:
+        return config_name.strip().lower()
+
+    return (
+        (
+            os.getenv("APP_ENV")
+            or os.getenv("FLASK_ENV")  # compatibility
+            or "development"
+        )
+        .strip()
+        .lower()
+    )
+
+
+def _env_bool(name: str, default: bool = False) -> bool:
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    return raw.strip().lower() in {"1", "true", "yes", "y", "on"}
 
 
 @dataclass(frozen=True)
 class Config:
-    # Flask
-    DEBUG: bool = False
+    # Core
+    SECRET_KEY: str = os.getenv("SECRET_KEY", "change-me")
+    DEBUG: bool = _env_bool("FLASK_DEBUG", False)
     TESTING: bool = False
 
-    # Populated from env at runtime:
-    SECRET_KEY: str | None = None
-
-    # SQLAlchemy / Flask-SQLAlchemy
-    SQLALCHEMY_DATABASE_URI: str | None = None
+    # Database
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
-    SQLALCHEMY_ENGINE_OPTIONS: Mapping[str, Any] = None  # type: ignore[assignment]
+    SQLALCHEMY_DATABASE_URI: str = os.getenv("DATABASE_URL", "")
+    SQLALCHEMY_ECHO: bool = _env_bool("SQLALCHEMY_ECHO", False)
+
+    # Cookies / session security (overridden in ProductionConfig)
+    SESSION_COOKIE_HTTPONLY: bool = True
+    SESSION_COOKIE_SAMESITE: str = "Lax"
+    SESSION_COOKIE_SECURE: bool = False
 
     # Logging
-    LOG_LEVEL: str = "INFO"
+    LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO").upper()
+    LOG_DIR: Path = Path(os.getenv("LOG_DIR", "logs"))
+    LOG_FILE_NAME: str = "app.log"
 
-    @classmethod
-    def load_from_env(cls, app: Flask) -> None:
-        """
-        Load required runtime values from environment variables.
-        This avoids evaluating env vars at import-time (better for tests and tooling).
-        """
-        app.config["SECRET_KEY"] = app.config.get("SECRET_KEY") or _env("SECRET_KEY")
-        database_url = app.config.get("SQLALCHEMY_DATABASE_URI") or _env("DATABASE_URL")
-        app.config["SQLALCHEMY_DATABASE_URI"] = database_url
-        app.config["DATABASE_URL"] = database_url  # convenience mirror
-
-        app.config["LOG_LEVEL"] = app.config.get("LOG_LEVEL") or (
-            _env("LOG_LEVEL") or "INFO"
-        )
-
-        # Sensible Postgres defaults (safe even if overridden)
-        app.config.setdefault(
+    def __post_init__(self) -> None:  # pragma: no cover (dataclass hook)
+        object.__setattr__(
+            self,
             "SQLALCHEMY_ENGINE_OPTIONS",
             {
                 "pool_pre_ping": True,
@@ -56,51 +68,35 @@ class Config:
             },
         )
 
-    @classmethod
-    def validate(cls, app: Flask) -> None:
-        """
-        Enforce required configuration from environment.
-        For TESTING, the TestingConfig supplies safe defaults, so we don't require env vars.
-        """
-        if app.config.get("TESTING", False):
-            return
 
-        required = ["SECRET_KEY", "SQLALCHEMY_DATABASE_URI"]
-        missing = [k for k in required if not app.config.get(k)]
-        if missing:
-            raise RuntimeError(
-                f"Missing required environment/config values: {', '.join(missing)}. "
-                "Set them in your environment or in a local .env file."
-            )
-
-
-@dataclass(frozen=True)
 class DevelopmentConfig(Config):
     DEBUG: bool = True
 
+    def __post_init__(self) -> None:  # pragma: no cover
+        super().__post_init__()
+        # Load .env locally if python-dotenv is present; production should provide env vars externally.
+        try:
+            from dotenv import load_dotenv  # type: ignore
 
-@dataclass(frozen=True)
+            load_dotenv(override=False)
+        except Exception:
+            pass
+
+
 class ProductionConfig(Config):
     DEBUG: bool = False
+    SESSION_COOKIE_SECURE: bool = True
 
 
-@dataclass(frozen=True)
 class TestingConfig(Config):
     TESTING: bool = True
-    SECRET_KEY: str = "testing-secret-key"
-    SQLALCHEMY_DATABASE_URI: str = "sqlite+pysqlite:///:memory:"
-    SQLALCHEMY_ENGINE_OPTIONS: Mapping[str, Any] = None  # type: ignore[assignment]
+    DEBUG: bool = False
 
-    @classmethod
-    def load_from_env(cls, app: Flask) -> None:
-        # Ignore external DB; keep tests hermetic and fast.
-        app.config["SECRET_KEY"] = cls.SECRET_KEY
-        app.config["SQLALCHEMY_DATABASE_URI"] = cls.SQLALCHEMY_DATABASE_URI
-        app.config["DATABASE_URL"] = cls.SQLALCHEMY_DATABASE_URI
-        app.config["LOG_LEVEL"] = "WARNING"
+    # Prefer SQLite for fast, hermetic tests; allow opt-in Postgres via TEST_DATABASE_URL.
+    SQLALCHEMY_DATABASE_URI: str = os.getenv(
+        "TEST_DATABASE_URL", "sqlite+pysqlite:///:memory:"
+    )
 
-        # Ensure a single in-memory DB across connections.
-        app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-            "connect_args": {"check_same_thread": False},
-            "poolclass": StaticPool,
-        }
+    def __post_init__(self) -> None:  # pragma: no cover
+        super().__post_init__()
+        object.__setattr__(self, "SQLALCHEMY_ENGINE_OPTIONS", {"pool_pre_ping": True})
