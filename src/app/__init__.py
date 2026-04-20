@@ -15,6 +15,7 @@ from app.config import (
 )
 from app.extensions import init_extensions
 from app.logging_config import configure_logging
+from app.security import init_security, security_context_processor
 
 
 def create_app(
@@ -40,9 +41,12 @@ def create_app(
         config_cls = TestingConfig
     else:
         config_cls = DevelopmentConfig
-    print(env)
 
-    app = Flask(__name__, instance_relative_config=False)
+    app = Flask(
+        __name__,
+        instance_relative_config=False,
+        template_folder="./templates/",
+    )
     app.config.from_object(config_cls)
 
     if config_overrides:
@@ -57,17 +61,16 @@ def create_app(
 
     # Initialize extensions (db, migrate)
     init_extensions(app)
+    init_security(app)
     init_admin(app)
     app.cli.add_command(seed_db)
 
-    # Import models so Flask-Migrate can discover them
-    # from app import models  # noqa: F401
-    #
+    from app import models
+
     # Register blueprints
     from app.blueprints.main import bp as main_bp
 
     app.register_blueprint(main_bp)
-
     return app
 
 

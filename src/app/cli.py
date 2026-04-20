@@ -5,10 +5,14 @@ import secrets
 from typing import Iterable
 
 import click
+from flask_security.core import UserMixin
+from flask_security.utils import hash_password
 from sqlalchemy import select
+import sqlalchemy
 
 from app.extensions import db
-from app.models.users import User
+from app.security import user_datastore
+from app.models.users import User, Role
 
 
 def _random_email() -> str:
@@ -23,26 +27,40 @@ def _random_phone() -> str:
     return str(random.random())
 
 
-def _ensure_admin(email: str = "admin@example.com", phone: str = "000") -> User:
-    existing = db.session.scalar(select(User).where(User.email == email))
+def _ensure_admin(
+    email: str = "admin@example.com", phone: str = "000"
+) -> User | UserMixin:
+    user_datastore.find_or_create_role(name="admin")
+    existing = user_datastore.find_user(email=email)
+
     if existing:
-        existing.is_admin = True
+        if not any(getattr(r, "name", None) == "admin" for r in existing.roles):
+            user_datastore.add_role_to_user(existing, "admin")
+
+        db.session.commit()
         return existing
 
-    admin = User(email=email, phone=phone, name="Admin User", is_admin=True)
-    db.session.add(admin)
+    pw = "admin@1412"
+
+    admin = user_datastore.create_user(
+        email=email,
+        phone=phone,
+        name="Admin User",
+        roles=["admin"],
+        password=pw,
+    )
+    db.session.commit()
     return admin
 
 
-def _create_users(n: int) -> Iterable[User]:
+def _create_users(n: int) -> Iterable[UserMixin]:
     for _ in range(n):
-        u = User(
+        u = user_datastore.create_user(
             email=_random_email(),
             phone=_random_phone(),
             name=_random_name(),
-            is_admin=False,
         )
-        db.session.add(u)
+        db.session.commit()
         yield u
 
 
@@ -59,7 +77,13 @@ def seed_db(users_count: int, reset: bool) -> None:
     """
     if reset:
         # For real apps, you might want per-model deletes.
-        db.session.execute(db.text("DELETE FROM users"))  # type: ignore[attr-defined]
+        db.session.execute(sqlalchemy.text("DELETE FROM roles_users"))
+
+        # Then delete children/parents
+        db.session.execute(sqlalchemy.delete(User))
+        db.session.execute(sqlalchemy.delete(Role))
+
+        db.session.commit()
 
     db.create_all()
     _ensure_admin()

@@ -4,22 +4,27 @@ from datetime import datetime
 from typing import Sequence
 from uuid import uuid4
 
-from sqlalchemy import Boolean, DateTime, Index, String, Text, event, func, select
+from sqlalchemy import DateTime, Index, String, Text, event, func, select
 from sqlalchemy.dialects.postgresql import TSVECTOR
 from sqlalchemy.engine import Connection
-from sqlalchemy.orm import Mapped, Session, mapped_column, relationship
+from sqlalchemy.orm import Mapped, Session, mapped_column
+from flask_security.models import fsqla_v3 as fsqla
 
 from app.extensions import db
 
+fsqla.FsModels.set_db_info(db, user_table_name="users", role_table_name="roles")
 
-class User(db.Model):
+
+class Role(db.Model, fsqla.FsRoleMixin):
+    __tablename__ = "roles"
+    pass
+
+
+class User(db.Model, fsqla.FsUserMixin):
     __tablename__ = "users"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
     phone: Mapped[str] = mapped_column(String(20), unique=True, index=True)
-    name: Mapped[str] = mapped_column(String(120), nullable=False, default=False)
-    is_admin: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    name: Mapped[str] = mapped_column(String(120), nullable=False, default="")
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -71,7 +76,7 @@ class User(db.Model):
             pattern = f"%{query}%"
             stmt = (
                 select(User)
-                .where((User.alternate_id.ilike(pattern)) | (User.email.ilike(pattern)))
+                .where((User.alternate_id.ilike(pattern)))
                 .order_by(User.created_at.desc())
                 .limit(limit)
             )

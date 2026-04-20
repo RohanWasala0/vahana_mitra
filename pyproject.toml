@@ -5,32 +5,24 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13.0"
 dependencies = [
-  "flask>=3.0,<4.0",
-  "flask-sqlalchemy>=3.1,<4.0",
-  "flask-migrate>=4.0,<5.0",
-  "sqlalchemy>=2.0,<3.0",
-  "psycopg[binary]>=3.2,<4.0",
-  "python-dotenv>=1.0,<2.0",
-  "gunicorn>=22.0,<23.0",
-  "flask-admin>=2.0.2",
+    "flask>=3.0,<4.0",
+    "flask-sqlalchemy>=3.1,<4.0",
+    "flask-migrate>=4.0,<5.0",
+    "sqlalchemy>=2.0,<3.0",
+    "psycopg[binary]>=3.2,<4.0",
+    "python-dotenv>=1.0,<2.0",
+    "gunicorn>=22.0,<23.0",
+    "flask-admin>=2.0.2",
+    "flask-login>=0.6.3",
+    "flask-security[babel,common,fsqla]>=5.8.0",
+    "helpers>=0.2.0",
 ]
 
 [dependency-groups]
-dev = [
-  "pytest>=8.0",
-  "python-dotenv>=1.2.1",
-]
-format = [
-    "black>=26.1.0",
-    "ruff>=0.15.2",
-]
-lint = [
-    "flake8>=7.3.0",
-    "flake8-bugbear>=25.11.29",
-]
-type = [
-    "mypy>=1.19.1",
-]
+dev = ["pytest>=8.0", "python-dotenv>=1.2.1"]
+format = ["black>=26.1.0", "ruff>=0.15.2"]
+lint = ["flake8>=7.3.0", "flake8-bugbear>=25.11.29"]
+type = ["mypy>=1.19.1"]
 
 [build-system]
 # uv build backend (official docs recommend an upper bound)
@@ -41,18 +33,18 @@ build-backend = "uv_build"
 # Our importable package is `app` under `src/`
 module-name = "app"
 module-root = "src"
-# Include templates/static in distributions (wheel/sdist)
-data = [
-  "src/app/templates",
-  "src/app/static",
-]
+# # Include templates/static in distributions (wheel/sdist)
+# data = [
+#   "src/app/templates",
+#   "src/app/static",
+# ]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
 filterwarnings = [
-  "error::DeprecationWarning:app.*",
-  "error::DeprecationWarning:tests.*",
+    "error::DeprecationWarning:app.*",
+    "error::DeprecationWarning:tests.*",
 ]
 
 [tool.black]
@@ -63,13 +55,7 @@ target-version = ["py313"]
 max-line-length = 88
 extend-ignore = ["E203", "W503"]
 select = ["E", "F", "W", "B"]
-exclude = [
-  ".venv",
-  "migrations",
-  "__pycache__",
-  "build",
-  "dist",
-]
+exclude = [".venv", "migrations", "__pycache__", "build", "dist"]
 
 [tool.mypy]
 python_version = "3.13.0"
@@ -84,9 +70,5 @@ strict_equality = true
 
 # Third-party libs may have partial typing; keep core strictness but avoid noise.
 [[tool.mypy.overrides]]
-module = [
-  "flask_migrate.*",
-  "flask_sqlalchemy.*",
-]
+module = ["flask_migrate.*", "flask_sqlalchemy.*"]
 ignore_missing_imports = true
-

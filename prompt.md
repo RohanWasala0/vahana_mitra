@@ -1,7 +1,7 @@
-You are a **Principal/Senior Python Backend Engineer** and **Flask platform architect**. You write production-grade, secure, typed, testable cli instruction and template code with clean structure, excellent defaults, and practical documentation.
+You are a **Senior Python Engineer** and **Flask Web platform architect**. You write production-grade, secure, typed, testable cli instruction and template code with clean structure, excellent defaults, and practical documentation.
 
 ## Objective
-Generate a **complete, production-ready Flask application scaffold** using **`uv`** for dependency + environment management and **`uv tools`** for tooling of command-line interfaces. The output must be **fully copy/pasteable** and include **all code** for **every file** you mention.
+Generate a **complete, production-ready Flask application scaffold** using **`uv`** for dependency + environment management and **`uv tools`** for tooling of command-line interfaces. The output must be **detailed step-by-step** guide.
 
 ## Non-negotiable Requirements
 1. **Architecture**
@@ -20,6 +20,8 @@ Generate a **complete, production-ready Flask application scaffold** using **`uv
      - `app/database.py` utility functions (e.g., init, session helpers if needed)
      - A **sample model** (e.g., `User`) with modern SQLAlchemy conventions.
    - Include **Flask-Migrate** and working migration wiring.
+   - Search (optional but common in logistics):
+     - Start with Postgres full-text + indexes
 
 3. **Configuration**
    - Class-based config: `Config`, `DevelopmentConfig`, `ProductionConfig`, `TestingConfig`.
@@ -134,4 +136,124 @@ Produce the answer in this order:
 - Project name: choose a sensible default like `flask_uv_scaffold` (or derive from my message), and use it consistently.
 - OS: assume macOS/Linux shell commands unless Windows is explicitly requested.
 
+Here’s a “best-practice, professional” Flask-centric stack for a logistics web app (shipments, tracking, dispatch, billing, warehouses), optimized for reliability, maintainability, and growth. I’ll list a solid default stack first, then common upgrades depending on scale/requirements.
+
+## Recommended professional stack (Flask)
+
+### Backend (Flask API)
+
+* **Python**: 3.11+ (fast, mature ecosystem)
+* **Framework**: **Flask** (API-focused) + **Blueprints** (modular structure)
+* **API style**: REST (simple) or GraphQL (only if you truly need it)
+* **Validation/serialization**: **Pydantic** (strong typing + validation) or **Marshmallow**
+* **Auth**:
+
+  * **JWT** for SPA/mobile clients (access + refresh tokens)
+  * **Session + CSRF** if you’re doing server-rendered templates
+  * **RBAC** (roles like Admin/Dispatcher/Driver/Customer) as first-class design
+
+### Data layer
+
+* **Database**: **PostgreSQL** (best general-purpose choice for logistics data)
+* **ORM**: **SQLAlchemy 2.x**
+* **Migrations**: **Alembic** (often via Flask-Migrate)
+* **Search (optional but common in logistics)**:
+
+  * Start with Postgres full-text + indexes
+  * Upgrade to **OpenSearch/Elasticsearch** if you need advanced search across shipments, PODs, addresses, etc.
+
+### Background jobs & async work (critical for logistics)
+
+Logistics apps almost always need async processing:
+
+* webhook processing, label generation, ETA calculation, batch imports, notifications, route optimization calls, etc.
+* **Task queue**: **Celery**
+* **Broker**: **Redis** (simple) or RabbitMQ (heavier-duty)
+* **Scheduler**: Celery Beat or APScheduler (Celery Beat is common)
+* **Realtime updates (optional)**: Flask-SocketIO or push via polling + events
+
+### Caching & rate limiting
+
+* **Redis**: caching, session storage (if needed), idempotency keys
+* **Rate limiting**: Flask-Limiter (protect APIs, especially tracking endpoints)
+
+### Frontend
+
+Two good “professional” options:
+
+1. **SPA**: **React (Next.js)** or **Vue (Nuxt)**
+
+   * best for dispatcher dashboards, maps, complex UIs
+2. **Server-rendered**: Flask + **Jinja2** + HTMX (fast to ship, simpler infra)
+
+For logistics specifically, dashboards often benefit from SPA + component libraries:
+
+* **UI**: MUI/Ant Design (React) or Vuetify (Vue)
+
+### Maps, geocoding, routing (logistics-specific)
+
+* **Maps**: Mapbox or Google Maps
+* **Geocoding**: Mapbox/Google or open-source **Nominatim** (OSM) depending on budget
+* **Distance matrix / routing**: Google Distance Matrix, Mapbox Directions, or OSRM (self-host)
+
+### Observability (this is where “professional” shows)
+
+* **Structured logging**: `structlog` or Python logging with JSON format
+* **Error tracking**: Sentry
+* **Metrics**: Prometheus + Grafana
+* **Tracing**: OpenTelemetry (optional but great for distributed systems)
+
+### Testing & quality
+
+* **pytest** + coverage
+* **Factory Boy** (fixtures), Faker
+* **Lint/format**: Ruff + Black
+* **Type checking**: mypy (optional but recommended on larger codebases)
+* **API contracts**: OpenAPI/Swagger (Flask-RESTX / flask-smorest / apispec)
+
+### Deployment & infrastructure
+
+* **WSGI server**: Gunicorn (common)
+* **Reverse proxy**: Nginx or an equivalent managed load balancer
+* **Containers**: Docker (standard)
+* **CI/CD**: GitHub Actions / GitLab CI
+* **Hosting**:
+
+  * AWS (ECS/Fargate), GCP (Cloud Run), Azure (Container Apps), or Kubernetes if you truly need it
+* **Secrets/config**: environment variables + a secrets manager (AWS Secrets Manager, etc.)
+
+---
+
+## Default architecture I’d choose for a logistics web app
+
+**Flask (REST API) + Postgres + Redis + Celery + React dashboard**
+This covers:
+
+* operational dashboards
+* async workflows (notifications, imports, integration polling)
+* scalable read paths (caching)
+* strong transactional integrity (Postgres)
+
+---
+
+## “It depends” upgrades (when you need them)
+
+* **High throughput / many integrations** → add **Kafka** (event streaming) or RabbitMQ with stronger patterns
+* **Complex reporting** → add a **warehouse** (BigQuery/Redshift) + ETL
+* **Multi-tenant SaaS** → enforce tenant isolation (schema-per-tenant or row-level) + strict RBAC
+* **Heavy read APIs (public tracking)** → cache aggressively + CDN + rate limit + idempotency keys
+* **Hard geospatial needs** → **PostGIS** in Postgres (geofencing, proximity queries, heatmaps)
+
+---
+
+## Practical stack summary (copy/paste)
+
+* Backend: Flask, SQLAlchemy, Alembic, Pydantic, JWT/RBAC
+* Data: PostgreSQL (+ PostGIS if needed)
+* Async: Celery + Redis
+* Frontend: Next.js (React) or Nuxt (Vue)
+* Infra: Docker, Gunicorn, Nginx, CI/CD
+* Observability: Sentry, Prometheus/Grafana, structured logs
+
+If you tell me whether your logistics site is **B2B dispatch dashboard**, **customer shipment tracking**, **last-mile delivery**, or **warehouse/inventory**, I’ll tailor the stack (and module breakdown) to the exact workflows.
 Now generate the complete scaffold.

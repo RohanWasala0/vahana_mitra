@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 from pathlib import Path
+import secrets
 
 
 def resolve_environment(config_name: str | None) -> str:
@@ -40,8 +41,27 @@ def _env_bool(name: str, default: bool = False) -> bool:
 class Config:
     # Core
     SECRET_KEY: str = os.getenv("SECRET_KEY", "change-me")
+    SECURITY_PASSWORD_SALT: str = os.environ.get(
+        "SECURITY_PASSWORD_SALT", str(secrets.SystemRandom().getrandbits(128))
+    )
     DEBUG: bool = _env_bool("FLASK_DEBUG", False)
     TESTING: bool = False
+
+    # Security
+    SECURITY_ANONYMOUS_USER_DISABLED = True
+    SECURITY_REGISTERABLE = True
+    SECURITY_SEND_REGISTER_EMAIL = False
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+    # Flask-Security URLs, overridden because they don't put a / at the end
+    SECURITY_BLUEPRINT_NAME = "security"
+    SECURITY_URL_PREFIX = ""
+    SECURITY_LOGIN_URL = "/login"
+    SECURITY_LOGOUT_URL = "/logout/"
+    SECURITY_REGISTER_URL = "/register/"
+    SECURITY_POST_LOGIN_VIEW = "/admin/"
+    SECURITY_POST_LOGOUT_VIEW = "/admin/"
+    SECURITY_POST_REGISTER_VIEW = "/admin/"
 
     # Database
     SQLALCHEMY_TRACK_MODIFICATIONS: bool = False
@@ -90,12 +110,12 @@ class ProductionConfig(Config):
 
 class TestingConfig(Config):
     TESTING: bool = True
-    DEBUG: bool = False
+    DEBUG: bool = True
 
-    # Prefer SQLite for fast, hermetic tests; allow opt-in Postgres via TEST_DATABASE_URL.
-    SQLALCHEMY_DATABASE_URI: str = os.getenv(
-        "TEST_DATABASE_URL", "sqlite+pysqlite:///:memory:"
-    )
+    BASE_DIR = Path(__file__).resolve().parent
+    DB_PATH = BASE_DIR / "instance" / "dev.db"
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+    SQLALCHEMY_DATABASE_URI: str = f"sqlite+pysqlite:///{DB_PATH}"
 
     def __post_init__(self) -> None:  # pragma: no cover
         super().__post_init__()
