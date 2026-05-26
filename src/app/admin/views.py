@@ -8,7 +8,7 @@ from wtforms import PasswordField, SelectField
 from typing import Any
 
 
-class SecureModelView:
+class SecureModelView(ModelView):
     """
     Base Admin view: deny by default; allow only authenticated users with admin role.
     """
