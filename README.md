@@ -17,5 +17,9 @@ Acceptance Criteria:
 One documented state diagram for Request + Truck
 List of allowed transitions (who can transition what)
 
-Landing page: [[https://codepen.io/MAHESHBYL/pen/Yzrvywp]]
-Dashboard: [[https://codepen.io/ash1198/pen/YPWNxxy]]
+this person has lot of ui components of logistics website but i dont like the css or theming
+[Ashish Ranjan](https://codepen.io/ash1198)
+
+[Landing page 0](https://codepen.io/MAHESHBYL/pen/Yzrvywp)
+[Landing page 1](https://codepen.io/Kashleeer/pen/GgjRvYX)
+[Dashboard this page is usefull as a last step for booking a load](https://codepen.io/ash1198/pen/YPWNxxy)
