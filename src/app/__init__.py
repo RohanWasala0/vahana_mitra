@@ -15,7 +15,7 @@ from app.config import (
 )
 from app.extensions import init_extensions
 from app.logging_config import configure_logging
-from app.security import init_security, security_context_processor
+from app.security import init_security
 
 
 def create_app(

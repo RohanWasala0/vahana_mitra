@@ -1,0 +1,7 @@
+{% extends 'admin/model/edit.html' %}
+{% from './truck_registration_from.html' import current_user_display, form_template%}
+
+{% block body %}
+    {{current_user_display(current_user)}}
+    {{form_template(form)}}
+{% endblock %}
