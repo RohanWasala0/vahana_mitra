@@ -1,7 +1,448 @@
-{% extends 'admin/model/edit.html' %}
-{% from './truck_registration_from.html' import current_user_display, form_template%}
+{% extends 'admin/master.html' %}
+
+{% block head_css %}
+{{ super() }}
+
+<style>
+    .vm-page-wrapper {
+        padding: 25px 10px;
+        background: #f5f7fb;
+        min-height: calc(100vh - 60px);
+    }
+
+    .vm-form-card {
+        max-width: 1100px;
+        margin: auto;
+        background: #ffffff;
+        border-radius: 18px;
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        border: 1px solid #e8ecf3;
+    }
+
+    .vm-card-header {
+        background: linear-gradient(135deg, #0d6efd, #083b8a);
+        color: #ffffff;
+        padding: 24px 30px;
+    }
+
+    .vm-card-header h2 {
+        margin: 0;
+        font-size: 26px;
+        font-weight: 700;
+    }
+
+    .vm-card-header p {
+        margin: 6px 0 0;
+        opacity: 0.9;
+        font-size: 14px;
+    }
+
+    .vm-form-body {
+        padding: 30px;
+    }
+
+    .vm-section {
+        background: #ffffff;
+        border: 1px solid #e5e9f2;
+        border-radius: 14px;
+        padding: 22px;
+        margin-bottom: 24px;
+    }
+
+    .vm-section-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #16213e;
+        margin-bottom: 18px;
+        border-left: 4px solid #0d6efd;
+        padding-left: 12px;
+    }
+
+    .vm-help-text {
+        font-size: 13px;
+        color: #6c757d;
+        margin-top: 5px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #24324b;
+        margin-bottom: 7px;
+    }
+
+    .form-control,
+    .form-select {
+        border-radius: 10px;
+        min-height: 44px;
+        border: 1px solid #d4dbe8;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.18);
+    }
+
+    .vm-user-action-box {
+        background: #f8fbff;
+        border: 1px dashed #9bbff5;
+        border-radius: 14px;
+        padding: 18px;
+        margin-top: 15px;
+    }
+
+    .vm-footer-actions {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        padding-top: 10px;
+    }
+
+    .vm-btn-main {
+        border-radius: 10px;
+        padding: 11px 22px;
+        font-weight: 700;
+    }
+
+    .vm-btn-secondary {
+        border-radius: 10px;
+        padding: 11px 20px;
+        font-weight: 600;
+    }
+
+    .invalid-feedback {
+        display: block;
+    }
+
+    .vm-required {
+        color: #dc3545;
+        font-weight: 700;
+    }
+
+    .vm-auto-filled {
+        background-color: #f4f9ff;
+    }
+</style>
+{% endblock %}
 
 {% block body %}
-    {{current_user_display(current_user)}}
-    {{form_template(form)}}
+
+<div class="vm-page-wrapper">
+<div class="vm-form-card">
+
+    <div class="vm-card-header">
+        <h2>Register New Truck</h2>
+        <p>Select an existing user or create a new user before registering the truck.</p>
+    </div>
+
+    <div class="vm-form-body">
+    <form method="POST" novalidate>
+        {{ form.hidden_tag() }}
+
+        <div class="vm-section">
+        <div class="vm-section-title">User Register the Truck Under</div>
+
+            <div class="row g-3 align-items-center">
+            <div class="col-md-8 mb-3">
+                <label class="form-label"> Select User <span class="vm-required">*</span></label>
+                {{ form.user_id(class="form-control " + ("is-invalid" if form.user_id.errors else ""),id="user_id") }}
+                {% if form.user_id.errors %}
+                    <div class="invalid-feedback">
+                    {% for error in form.user_id.errors %}
+                        {{ error }}
+                    {% endfor %}
+                    </div>
+                {% endif %}
+                <div class="vm-help-text">
+                             When you select a user, owner name, phone, Aadhaar, and PAN will auto-fill below.
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+            <div class="vm-user-action-box">
+            <div class="form-check">
+                <input
+                    class="form-check-input"
+                    type="checkbox"
+                    value="1"
+                    id="make_new_user"
+                    name="make_new_user">
+                <label class="form-check-label" for="make_new_user">Register truck under a new user</label>
+            </div>
+            <button
+                type="submit"
+                class="btn btn-outline-primary btn-sm mt-3">Go to User Create Page</button>
+            </div>
+            </div>
+            </div>
+        </div>
+
+        <div class="vm-section">
+        <div class="vm-section-title">Truck Information</div>
+        <div class="row g-3 align-items-center">
+
+            <div class="col-md-6 mb-3">
+            <label class="form-label">
+                Current Location <span class="vm-help-text"> Have to code it take a proper location input</span>
+                {% if form.truck_current_location.flags.required %}
+                    <span class="vm-required">*</span>
+                {% endif %}
+            </label>
+            {{ form.truck_current_location(class="form-control " + ("is-invalid" if form.truck_current_location.errors else "")) }}
+            {% if form.truck_current_location.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.truck_current_location.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            </div>
+
+            <div class="col-md-6 mb-3">
+            <label class="form-label">
+                Truck Model
+                {% if form.vehicle_model_name.flags.required %}
+                    <span class="vm-required">*</span>
+                {% endif %}
+            </label>
+            {{ form.vehicle_model_name(lass="form-control " + ("is-invalid" if form.vehicle_model_name.errors else "") )}}
+            {% if form.vehicle_model_name.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.vehicle_model_name.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">
+                                Truck RTO Number
+                                {% if form.vehicle_registration_number.flags.required %}
+                                    <span class="vm-required">*</span>
+                                {% endif %}
+                            </label>
+
+                            {{ form.vehicle_registration_number(
+                                class="form-control text-uppercase " + ("is-invalid" if form.vehicle_registration_number.errors else "")
+                            ) }}
+
+                            {% if form.vehicle_registration_number.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.vehicle_registration_number.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">
+                                Truck Type
+                                {% if form.vehicle_type.flags.required %}
+                                    <span class="vm-required">*</span>
+                                {% endif %}
+                            </label>
+
+                            {{ form.vehicle_type(
+                                class="form-control " + ("is-invalid" if form.vehicle_type.errors else "")
+                            ) }}
+
+                            {% if form.vehicle_type.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.vehicle_type.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">
+                                Truck Capacity
+                                {% if form.vehicle_capacity.flags.required %}
+                                    <span class="vm-required">*</span>
+                                {% endif %}
+                            </label>
+
+                            <div class="input-group">
+                                {{ form.vehicle_capacity(
+                                    class="form-control " + ("is-invalid" if form.vehicle_capacity.errors else "")
+                                ) }}
+                                <span class="input-group-text">Tons</span>
+                            </div>
+
+                            {% if form.vehicle_capacity.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.vehicle_capacity.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="vm-section">
+                    <div class="vm-section-title">Truck Owner Information</div>
+
+                    <div class="row g-3 align-items-center">
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                Owner Name
+                                {% if form.truck_owner_name.flags.required %}
+                                    <span class="vm-required">*</span>
+                                {% endif %}
+                            </label>
+
+                            {{ form.truck_owner_name(
+                                class="form-control " + ("is-invalid" if form.truck_owner_name.errors else ""),
+                                id="truck_owner_name"
+                            ) }}
+
+                            {% if form.truck_owner_name.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.truck_owner_name.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                Owner Contact Number
+                                {% if form.truck_owner_phone.flags.required %}
+                                    <span class="vm-required">*</span>
+                                {% endif %}
+                            </label>
+
+                            {{ form.truck_owner_phone(
+                                class="form-control " + ("is-invalid" if form.truck_owner_phone.errors else ""),
+                                id="truck_owner_phone"
+                            ) }}
+
+                            {% if form.truck_owner_phone.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.truck_owner_phone.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Aadhaar Number</label>
+
+                            {{ form.truck_owner_aadhaar(
+                                class="form-control " + ("is-invalid" if form.truck_owner_aadhaar.errors else ""),
+                                id="truck_owner_aadhaar"
+                            ) }}
+
+                            {% if form.truck_owner_aadhaar.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.truck_owner_aadhaar.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">PAN Number</label>
+
+                            {{ form.truck_owner_pan(
+                                class="form-control text-uppercase " + ("is-invalid" if form.truck_owner_pan.errors else ""),
+                                id="truck_owner_pan"
+                            ) }}
+
+                            {% if form.truck_owner_pan.errors %}
+                                <div class="invalid-feedback">
+                                    {% for error in form.truck_owner_pan.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="vm-footer-actions">
+                    <a href="{{ return_url }}" class="btn btn-light border vm-btn-secondary">
+                        Cancel
+                    </a>
+
+                    {{ form.submit(class="btn btn-primary vm-btn-main") }}
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<script id="users-data" type="application/json">
+    {{ users_json | safe }}
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const users = JSON.parse(document.getElementById("users-data").textContent);
+
+        const userSelect = document.getElementById("user_id");
+        const makeNewUserCheckbox = document.getElementById("make_new_user");
+
+        const ownerName = document.getElementById("truck_owner_name");
+        const ownerPhone = document.getElementById("truck_owner_phone");
+        const ownerAadhaar = document.getElementById("truck_owner_aadhaar");
+        const ownerPan = document.getElementById("truck_owner_pan");
+
+        function setValue(input, value) {
+            if (!input) return;
+
+            input.value = value || "";
+
+            if (value) {
+                input.classList.add("vm-auto-filled");
+            } else {
+                input.classList.remove("vm-auto-filled");
+            }
+        }
+
+        function autofillOwnerInfo() {
+            const selectedUserId = parseInt(userSelect.value);
+
+            const user = users.find(function (item) {
+                return item.id === selectedUserId;
+            });
+
+            if (!user) {
+                setValue(ownerName, "");
+                setValue(ownerPhone, "");
+                setValue(ownerAadhaar, "");
+                setValue(ownerPan, "");
+                return;
+            }
+
+            setValue(ownerName, user.name);
+            setValue(ownerPhone, user.phone);
+            setValue(ownerAadhaar, user.aadhaar);
+            setValue(ownerPan, user.pan);
+        }
+
+        userSelect.addEventListener("change", autofillOwnerInfo);
+
+        makeNewUserCheckbox.addEventListener("change", function () {
+            if (makeNewUserCheckbox.checked) {
+                window.location.href = "{{ user_create_url }}";
+            }
+        });
+
+        autofillOwnerInfo();
+    });
+</script>
+
 {% endblock %}
