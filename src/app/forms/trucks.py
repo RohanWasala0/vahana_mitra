@@ -6,6 +6,7 @@ from wtforms import (
     FileField,
     DateField,
     SubmitField,
+    TelField,
 )
 from wtforms.validators import DataRequired, Length, Regexp
 
@@ -32,7 +33,62 @@ class TruckRegistrationForm(FlaskForm):
     vehicle_registration_number = StringField(
         "Registration number", validators=[DataRequired(), Length(min=9, max=10)]
     )
-    vehicle_model_name = StringField("Trucks Model", validators=[DataRequired()])
+    vehicle_model_name = SelectField(
+        "Truck Model",
+        choices=[
+            ("", "Select Truck Model"),
+            # Tata Motors
+            ("Tata Ace", "Tata Ace"),
+            ("Tata Intra", "Tata Intra"),
+            ("Tata Yodha Pickup", "Tata Yodha Pickup"),
+            ("Tata 407 Gold SFC", "Tata 407 Gold SFC"),
+            ("Tata LPT", "Tata LPT"),
+            ("Tata Ultra", "Tata Ultra"),
+            ("Tata Signa", "Tata Signa"),
+            ("Tata Prima", "Tata Prima"),
+            # Ashok Leyland
+            ("Ashok Leyland Dost", "Ashok Leyland Dost"),
+            ("Ashok Leyland Bada Dost", "Ashok Leyland Bada Dost"),
+            ("Ashok Leyland Partner", "Ashok Leyland Partner"),
+            ("Ashok Leyland Boss", "Ashok Leyland Boss"),
+            ("Ashok Leyland ecomet", "Ashok Leyland ecomet"),
+            ("Ashok Leyland AVTR", "Ashok Leyland AVTR"),
+            # BharatBenz
+            ("BharatBenz LDT", "BharatBenz LDT"),
+            ("BharatBenz MDT", "BharatBenz MDT"),
+            ("BharatBenz HDT R", "BharatBenz HDT R"),
+            ("BharatBenz HDT RT", "BharatBenz HDT RT"),
+            ("BharatBenz HDT C", "BharatBenz HDT C"),
+            ("BharatBenz HDT T", "BharatBenz HDT T"),
+            # Eicher
+            ("Eicher Pro 2000", "Eicher Pro 2000 Series"),
+            ("Eicher Pro 3000", "Eicher Pro 3000 Series"),
+            ("Eicher Pro 5000", "Eicher Pro 5000 Series"),
+            ("Eicher Pro 6000", "Eicher Pro 6000 Series"),
+            # Mahindra
+            ("Mahindra Jeeto", "Mahindra Jeeto"),
+            ("Mahindra Supro", "Mahindra Supro"),
+            ("Mahindra Bolero Pikup", "Mahindra Bolero Pikup"),
+            ("Mahindra Loadking", "Mahindra Loadking"),
+            ("Mahindra Furio", "Mahindra Furio"),
+            ("Mahindra Blazo X", "Mahindra Blazo X"),
+            # SML Isuzu / SML Mahindra
+            ("SML Sartaj", "SML Sartaj"),
+            ("SML Samrat", "SML Samrat"),
+            ("SML Supreme", "SML Supreme"),
+            ("SML Prestige", "SML Prestige"),
+            # Force Motors
+            ("Force Traveller Delivery Van", "Force Traveller Delivery Van"),
+            ("Force Traveller Wide Body", "Force Traveller Wide Body"),
+            # Volvo
+            ("Volvo FM", "Volvo FM"),
+            ("Volvo FMX", "Volvo FMX"),
+            # fallback
+            ("Other", "Other"),
+        ],
+        validators=[DataRequired(message="Please select a truck model.")],
+    )
+    other_vehicle_model_name = StringField("Other Truck Model")
     vehicle_type = SelectField(
         "Lorry type Needed",
         choices=VEHICLE_TYPE_CHOICES,
@@ -45,7 +101,7 @@ class TruckRegistrationForm(FlaskForm):
     vehicle_permit = StringField("Vehicle permits")
 
     truck_owner_name = StringField("Owners name", validators=[Length(min=10)])
-    truck_owner_phone = StringField("Phone Number", validators=[Length(min=10, max=20)])
+    truck_owner_phone = TelField("Phone Number", validators=[Length(min=10, max=20)])
     truck_owner_aadhaar = StringField(
         "Owners Aadhaar number",
         validators=[Regexp(AADHAAR_REGEX, message="Write a valid aadhaar number")],

@@ -135,11 +135,11 @@ class TruckAdminView(ModelView):
     def _set_user_choice(self, form):
         users = self._get_user_dropdown()
 
-        form.user_id.choices = [{0, "Select truck owner"}] + [
-            {
+        form.user_id.choices = [(0, "Select truck owner")] + [
+            (
                 user.id,
                 f"{user.name} - {getattr(user, 'phone', 'N/A') or getattr(user, 'email', 'N/A')}",
-            }
+            )
             for user in users
         ]
 
@@ -148,7 +148,7 @@ class TruckAdminView(ModelView):
     @expose("/new/", methods=["GET", "POST"])
     def create_view(self):
         form = TruckRegistrationForm()
-        users = self._set_user_choice(form)
+        _ = self._set_user_choice(form)
         user_create_url = url_for("users.create_view", url=request.url)
         return_url = request.args.get("url") or self.get_url(".index_view")
 
@@ -160,19 +160,29 @@ class TruckAdminView(ModelView):
                 )
                 return redirect(user_create_url)
             if form.validate_on_submit():
-                selected_user = db.seesion.get(User, form.user_id.data)
+                selected_user = db.session.get(User, form.user_id.data)
 
                 if not selected_user:
-                    form.user_id.errors.append("Selected user does not exist.")
+                    form.user_id.errors = [
+                        *form.user_id.errors,
+                        "Select user is invalid",
+                    ]
 
                 else:
+                    vehicle_model_name = (
+                        form.vehicle_model_name.data
+                        if form.vehicle_model_name.data != "Other"
+                        else form.other_vehicle_model_name.data
+                    )
+                    print(form.vehicle_capacity.data)
                     truck = Truck(
                         user_id=selected_user.id,
                         # Vehical info
+                        current_location=form.truck_current_location.data or "",
                         vehicle_registration_number=form.vehicle_registration_number.data,
-                        vehicle_model_name=form.vehicle_model_name.data,
                         vehicle_type=form.vehicle_type.data,
                         vehicle_capacity=form.vehicle_capacity.data,
+                        vehicle_model_name=vehicle_model_name,
                         # Owner info
                         truck_owner_name=form.truck_owner_name.data,
                         truck_owner_phone=form.truck_owner_phone.data,

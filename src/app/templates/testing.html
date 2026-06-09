@@ -206,7 +206,7 @@
                     <span class="vm-required">*</span>
                 {% endif %}
             </label>
-            {{ form.vehicle_model_name(lass="form-control " + ("is-invalid" if form.vehicle_model_name.errors else "") )}}
+            {{ form.vehicle_model_name(class="form-control " + ("is-invalid" if form.vehicle_model_name.errors else "") )}}
             {% if form.vehicle_model_name.errors %}
                 <div class="invalid-feedback">
                     {% for error in form.vehicle_model_name.errors %}
@@ -216,177 +216,219 @@
             {% endif %}
             </div>
 
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">
-                                Truck RTO Number
-                                {% if form.vehicle_registration_number.flags.required %}
-                                    <span class="vm-required">*</span>
-                                {% endif %}
-                            </label>
-
-                            {{ form.vehicle_registration_number(
-                                class="form-control text-uppercase " + ("is-invalid" if form.vehicle_registration_number.errors else "")
-                            ) }}
-
-                            {% if form.vehicle_registration_number.errors %}
-                                <div class="invalid-feedback">
-                                    {% for error in form.vehicle_registration_number.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">
-                                Truck Type
-                                {% if form.vehicle_type.flags.required %}
-                                    <span class="vm-required">*</span>
-                                {% endif %}
-                            </label>
-
-                            {{ form.vehicle_type(
-                                class="form-control " + ("is-invalid" if form.vehicle_type.errors else "")
-                            ) }}
-
-                            {% if form.vehicle_type.errors %}
-                                <div class="invalid-feedback">
-                                    {% for error in form.vehicle_type.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label">
-                                Truck Capacity
-                                {% if form.vehicle_capacity.flags.required %}
-                                    <span class="vm-required">*</span>
-                                {% endif %}
-                            </label>
-
-                            <div class="input-group">
-                                {{ form.vehicle_capacity(
-                                    class="form-control " + ("is-invalid" if form.vehicle_capacity.errors else "")
-                                ) }}
-                                <span class="input-group-text">Tons</span>
-                            </div>
-
-                            {% if form.vehicle_capacity.errors %}
-                                <div class="invalid-feedback">
-                                    {% for error in form.vehicle_capacity.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-
-                    </div>
+            <div class="col-md-4 mb-3">
+            <label class="form-label">
+                Truck RTO Number
+                {% if form.vehicle_registration_number.flags.required %}
+                    <span class="vm-required">*</span>
+                {% endif %}
+            </label>
+            {{ form.vehicle_registration_number(class="form-control text-uppercase " + ("is-invalid" if form.vehicle_registration_number.errors else "")) }}
+            {% if form.vehicle_registration_number.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.vehicle_registration_number.errors %}
+                        {{ error }}
+                    {% endfor %}
                 </div>
+            {% endif %}
+            </div>
 
-                <div class="vm-section">
-                    <div class="vm-section-title">Truck Owner Information</div>
-
-                    <div class="row g-3 align-items-center">
-
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                Owner Name
-                                {% if form.truck_owner_name.flags.required %}
-                                    <span class="vm-required">*</span>
-                                {% endif %}
-                            </label>
-
-                            {{ form.truck_owner_name(
-                                class="form-control " + ("is-invalid" if form.truck_owner_name.errors else ""),
-                                id="truck_owner_name"
-                            ) }}
-
-                            {% if form.truck_owner_name.errors %}
-                                <div class="invalid-feedback">
-                                    {% for error in form.truck_owner_name.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">
-                                Owner Contact Number
-                                {% if form.truck_owner_phone.flags.required %}
-                                    <span class="vm-required">*</span>
-                                {% endif %}
-                            </label>
-
-                            {{ form.truck_owner_phone(
-                                class="form-control " + ("is-invalid" if form.truck_owner_phone.errors else ""),
-                                id="truck_owner_phone"
-                            ) }}
-
-                            {% if form.truck_owner_phone.errors %}
-                                <div class="invalid-feedback">
-                                    {% for error in form.truck_owner_phone.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Aadhaar Number</label>
-
-                            {{ form.truck_owner_aadhaar(
-                                class="form-control " + ("is-invalid" if form.truck_owner_aadhaar.errors else ""),
-                                id="truck_owner_aadhaar"
-                            ) }}
-
-                            {% if form.truck_owner_aadhaar.errors %}
-                                <div class="invalid-feedback">
-                                    {% for error in form.truck_owner_aadhaar.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">PAN Number</label>
-
-                            {{ form.truck_owner_pan(
-                                class="form-control text-uppercase " + ("is-invalid" if form.truck_owner_pan.errors else ""),
-                                id="truck_owner_pan"
-                            ) }}
-
-                            {% if form.truck_owner_pan.errors %}
-                                <div class="invalid-feedback">
-                                    {% for error in form.truck_owner_pan.errors %}
-                                        {{ error }}
-                                    {% endfor %}
-                                </div>
-                            {% endif %}
-                        </div>
-
-                    </div>
+            <div class="col-md-4 mb-3">
+            <label class="form-label">
+                Truck Type
+                {% if form.vehicle_type.flags.required %}
+                    <span class="vm-required">*</span>
+                {% endif %}
+            </label>
+            {{ form.vehicle_type(class="form-control " + ("is-invalid" if form.vehicle_type.errors else "") )}}
+            {% if form.vehicle_type.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.vehicle_type.errors %}
+                        {{ error }}
+                    {% endfor %}
                 </div>
+            {% endif %}
+            </div>
 
-                <div class="vm-footer-actions">
-                    <a href="{{ return_url }}" class="btn btn-light border vm-btn-secondary">
-                        Cancel
-                    </a>
-
-                    {{ form.submit(class="btn btn-primary vm-btn-main") }}
+            <div class="col-md-4 mb-3">
+            <label class="form-label">
+                Truck Capacity
+                {% if form.vehicle_capacity.flags.required %}
+                    <span class="vm-required">*</span>
+                {% endif %}
+            </label>
+            <div class="input-group">
+                {{ form.vehicle_capacity(class="form-control " + ("is-invalid" if form.vehicle_capacity.errors else "")) }}
+                <span class="input-group-text">Tons</span>
+            </div>
+            {% if form.vehicle_capacity.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.vehicle_capacity.errors %}
+                        {{ error }}
+                    {% endfor %}
                 </div>
+            {% endif %}
+            </div>
 
-            </form>
         </div>
+        </div>
+
+        <div class="vm-section">
+        <div class="vm-section-title">Truck Owner Information</div>
+        <div class="row g-3 align-items-center">
+
+            <div class="col-md-6 mb-3">
+            <label class="form-label">
+                Owner Name
+                {% if form.truck_owner_name.flags.required %}
+                    <span class="vm-required">*</span>
+                {% endif %}
+            </label>
+            {{ form.truck_owner_name(
+                class="form-control " + ("is-invalid" if form.truck_owner_name.errors else ""),
+                id="truck_owner_name"
+            ) }}
+            {% if form.truck_owner_name.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.truck_owner_name.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            </div>
+
+            <div class="col-md-6 mb-3">
+            <label class="form-label">
+                Owner Contact Number
+                {% if form.truck_owner_phone.flags.required %}
+                    <span class="vm-required">*</span>
+                {% endif %}
+            </label>
+            {{ form.truck_owner_phone(
+                class="form-control " + ("is-invalid" if form.truck_owner_phone.errors else ""),
+                id="truck_owner_phone",
+                type="tel",
+                inputmode="tel",
+            ) }}
+            {% if form.truck_owner_phone.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.truck_owner_phone.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            </div>
+
+            <div class="col-md-6 mb-3">
+            <label class="form-label">Aadhaar Number</label>
+            {{ form.truck_owner_aadhaar(
+                class="form-control " + ("is-invalid" if form.truck_owner_aadhaar.errors else ""),
+                id="truck_owner_aadhaar"
+            ) }}
+            {% if form.truck_owner_aadhaar.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.truck_owner_aadhaar.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            </div>
+
+            <div class="col-md-6 mb-3">
+            <label class="form-label">PAN Number</label>
+            {{ form.truck_owner_pan(
+                class="form-control text-uppercase " + ("is-invalid" if form.truck_owner_pan.errors else ""),
+                id="truck_owner_pan"
+            ) }}
+            {% if form.truck_owner_pan.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.truck_owner_pan.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            </div>
+
+        </div>
+        </div>
+
+        <div class="vm-section">
+        <div class="vm-section-title">Truck Driver Information</div>
+        <div class="row g-3 align-items-center">
+
+            <div class="col-md-6 mb-3">
+            <label class="form-label">
+                Driver Name
+                {% if form.truck_driver_name.flags.required %}
+                    <span class="vm-required">*</span>
+                {% endif %}
+            </label>
+            {{ form.truck_driver_name(
+                class="form-control " + ("is-invalid" if form.truck_driver_name.errors else ""),
+                id="truck_driver_name"
+            ) }}
+            {% if form.truck_driver_name.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.truck_driver_name.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            </div>
+
+            <div class="col-md-6 mb-3">
+            <label class="form-label">
+                Driver Contact Number
+                {% if form.truck_driver_phone.flags.required %}
+                    <span class="vm-required">*</span>
+                {% endif %}
+            </label>
+            {{ form.truck_driver_phone(
+                class="form-control " + ("is-invalid" if form.truck_driver_phone.errors else ""),
+                id="truck_driver_phone",
+                type="tel",
+                inputmode="tel",
+            ) }}
+            {% if form.truck_driver_phone.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.truck_driver_phone.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            </div>
+
+            <div class="col-md-6 mb-3">
+            <label class="form-label">Aadhaar Number</label>
+            {{ form.truck_driver_aadhaar(
+                class="form-control " + ("is-invalid" if form.truck_driver_aadhaar.errors else ""),
+                id="truck_driver_aadhaar"
+            ) }}
+            {% if form.truck_driver_aadhaar.errors %}
+                <div class="invalid-feedback">
+                    {% for error in form.truck_driver_aadhaar.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            </div>
+
+        </div>
+        </div>
+
+        <div class="vm-footer-actions">
+        <a href="{{ return_url }}" class="btn btn-light border vm-btn-secondary">Cancel</a>
+        {{ form.submit(class="btn btn-primary vm-btn-main") }}
+        </div>
+
+    </form>
     </div>
 </div>
+</div>
 
-<script id="users-data" type="application/json">
-    {{ users_json | safe }}
-</script>
+<!-- <script id="users-data" type="application/json"> -->
+<!--     {{ users_json | safe }} -->
+<!-- </script> -->
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
