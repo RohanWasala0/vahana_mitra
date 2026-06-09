@@ -1,0 +1,476 @@
+{% extends "admin/master.html" %}
+
+{% block head_css %}
+    {{ super() }}
+
+    <style>
+        .vm-dashboard {
+            padding: 20px 10px;
+        }
+
+        .vm-page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .vm-page-title {
+            margin: 0;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .vm-page-subtitle {
+            margin: 4px 0 0;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .vm-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .vm-btn {
+            display: inline-block;
+            padding: 9px 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            text-decoration: none;
+            border: 1px solid transparent;
+        }
+
+        .vm-btn-primary {
+            background: #2563eb;
+            color: #ffffff;
+        }
+
+        .vm-btn-secondary {
+            background: #ffffff;
+            color: #374151;
+            border-color: #d1d5db;
+        }
+
+        .vm-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .vm-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            padding: 18px;
+            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+        }
+
+        .vm-card-label {
+            margin: 0;
+            font-size: 13px;
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .vm-card-value {
+            margin: 8px 0 0;
+            font-size: 30px;
+            font-weight: 800;
+            color: #111827;
+        }
+
+        .vm-card-note {
+            margin: 6px 0 0;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .vm-section-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .vm-section-title {
+            margin: 0 0 14px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .vm-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .vm-table th {
+            text-align: left;
+            padding: 10px;
+            border-bottom: 1px solid #e5e7eb;
+            color: #6b7280;
+            font-weight: 700;
+            background: #f9fafb;
+        }
+
+        .vm-table td {
+            padding: 10px;
+            border-bottom: 1px solid #f3f4f6;
+            color: #374151;
+            vertical-align: top;
+        }
+
+        .vm-badge {
+            display: inline-block;
+            padding: 4px 9px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-assigned {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-picked-up,
+        .status-in-transit {
+            background: #ede9fe;
+            color: #5b21b6;
+        }
+
+        .status-delivered {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-cancelled {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .vm-alert {
+            padding: 12px 14px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border: 1px solid;
+        }
+
+        .vm-alert-danger {
+            background: #fef2f2;
+            border-color: #fecaca;
+            color: #991b1b;
+        }
+
+        .vm-alert-warning {
+            background: #fffbeb;
+            border-color: #fde68a;
+            color: #92400e;
+        }
+
+        .vm-alert-info {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+            color: #1e40af;
+        }
+
+        .vm-alert-title {
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .vm-muted {
+            color: #6b7280;
+        }
+
+        .vm-log-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .vm-log-action {
+            font-weight: 800;
+            color: #111827;
+            font-size: 13px;
+        }
+
+        .vm-log-message {
+            color: #4b5563;
+            font-size: 13px;
+            margin-top: 3px;
+        }
+
+        .vm-log-time {
+            color: #9ca3af;
+            font-size: 12px;
+            margin-top: 3px;
+        }
+
+        @media (max-width: 1100px) {
+            .vm-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .vm-section-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .vm-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .vm-page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+
+<div class="vm-dashboard">
+
+    <div class="vm-page-header">
+        <div>
+            <h2 class="vm-page-title">Vahana Mitra Admin Dashboard</h2>
+            <p class="vm-page-subtitle">
+                Monitor loads, users, trucks, assignments, and recent platform activity.
+            </p>
+        </div>
+
+        <div class="vm-actions">
+            <a class="vm-btn vm-btn-primary" href="{{ url_for('load.create_view') }}">
+                Schedule Load
+            </a>
+            <a class="vm-btn vm-btn-secondary" href="{{ url_for('truck.create_view') }}">
+                Add Truck
+            </a>
+            <a class="vm-btn vm-btn-secondary" href="{{ url_for('users.create_view') }}">
+                Add User
+            </a>
+        </div>
+    </div>
+
+    <div class="vm-grid">
+        <div class="vm-card">
+            <p class="vm-card-label">Active Loads</p>
+            <p class="vm-card-value">{{ dashboard.active_loads }}</p>
+            <p class="vm-card-note">Pending, assigned, picked up, or in transit</p>
+        </div>
+
+        <div class="vm-card">
+            <p class="vm-card-label">Loads Without Truck</p>
+            <p class="vm-card-value">{{ dashboard.loads_without_truck }}</p>
+            <p class="vm-card-note">Need admin matching</p>
+        </div>
+
+        <div class="vm-card">
+            <p class="vm-card-label">Active Users</p>
+            <p class="vm-card-value">{{ dashboard.active_users }}</p>
+            <p class="vm-card-note">{{ dashboard.new_users_today }} new today</p>
+        </div>
+
+        <div class="vm-card">
+            <p class="vm-card-label">Available Trucks</p>
+            <p class="vm-card-value">{{ dashboard.available_trucks }}</p>
+            <p class="vm-card-note">{{ dashboard.busy_trucks }} currently busy</p>
+        </div>
+    </div>
+
+    <div class="vm-grid">
+        <div class="vm-card">
+            <p class="vm-card-label">Pending</p>
+            <p class="vm-card-value">{{ dashboard.pending_loads }}</p>
+        </div>
+
+        <div class="vm-card">
+            <p class="vm-card-label">Assigned</p>
+            <p class="vm-card-value">{{ dashboard.assigned_loads }}</p>
+        </div>
+
+        <div class="vm-card">
+            <p class="vm-card-label">In Transit</p>
+            <p class="vm-card-value">{{ dashboard.in_transit_loads }}</p>
+        </div>
+
+        <div class="vm-card">
+            <p class="vm-card-label">Delivered</p>
+            <p class="vm-card-value">{{ dashboard.completed_loads }}</p>
+        </div>
+    </div>
+
+    <div class="vm-section-grid">
+
+        <div class="vm-card">
+            <h3 class="vm-section-title">Recent Loads</h3>
+
+            {% if dashboard.recent_loads %}
+                <table class="vm-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Route</th>
+                            <th>Status</th>
+                            <th>Truck</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for load in dashboard.recent_loads %}
+                            <tr>
+                                <td>#{{ load.id }}</td>
+                                <td>
+                                    {{ load.pickup_location or "N/A" }}
+                                    →
+                                    {{ load.drop_location or "N/A" }}
+                                </td>
+                                <td>
+                                    <span class="vm-badge status-{{ load.status|lower|replace('_', '-') }}">
+                                        {{ load.status }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if load.truck_id %}
+                                        Truck #{{ load.truck_id }}
+                                    {% else %}
+                                        <span class="vm-muted">Not assigned</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if load.created_at %}
+                                        {{ load.created_at.strftime("%d %b %Y, %I:%M %p") }}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="vm-muted">No loads found.</p>
+            {% endif %}
+        </div>
+
+        <div class="vm-card">
+            <h3 class="vm-section-title">Operations Alerts</h3>
+
+            {% if dashboard.alerts %}
+                {% for alert in dashboard.alerts %}
+                    <div class="vm-alert vm-alert-{{ alert.level }}">
+                        <div class="vm-alert-title">{{ alert.title }}</div>
+                        <div>{{ alert.message }}</div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="vm-muted">No critical alerts right now.</p>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <div class="vm-section-grid">
+
+        <div class="vm-card">
+            <h3 class="vm-section-title">Available Trucks</h3>
+
+            {% if dashboard.available_truck_list %}
+                <table class="vm-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Registration</th>
+                            <th>Type</th>
+                            <th>Current Location</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for truck in dashboard.available_truck_list %}
+                            <tr>
+                                <td>#{{ truck.id }}</td>
+                                <td>{{ truck.vehicle_registration_number }}</td>
+                                <td>{{ truck.vehicle_type }}</td>
+                                <td>{{ truck.truck_current_location or "N/A" }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="vm-muted">No available trucks found.</p>
+            {% endif %}
+        </div>
+
+        <div class="vm-card">
+            <h3 class="vm-section-title">Load Status Summary</h3>
+
+            {% if dashboard.load_status_counts %}
+                <table class="vm-table">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Count</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for status, count in dashboard.load_status_counts.items() %}
+                            <tr>
+                                <td>
+                                    <span class="vm-badge status-{{ status|lower|replace('_', '-') }}">
+                                        {{ status }}
+                                    </span>
+                                </td>
+                                <td>{{ count }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="vm-muted">No status data available.</p>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <div class="vm-card">
+        <h3 class="vm-section-title">Recent Activity Logs</h3>
+
+        {% if dashboard.recent_logs %}
+            {% for log in dashboard.recent_logs %}
+                <div class="vm-log-item">
+                    <div class="vm-log-action">{{ log.action }}</div>
+                    <div class="vm-log-message">{{ log.message }}</div>
+                    <div class="vm-log-time">
+                        {% if log.created_at %}
+                            {{ log.created_at.strftime("%d %b %Y, %I:%M %p") }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="vm-muted">No recent activity logs found.</p>
+        {% endif %}
+    </div>
+
+</div>
+
+{% endblock %}

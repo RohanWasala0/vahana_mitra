@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from flask_wtf import FlaskForm
 from wtforms import (
     SelectField,
@@ -23,14 +25,14 @@ PAN_REGEX = r"^[A-Z]{5}[0-9]{4}[A-Z]{1}"
 
 
 class TruckRegistrationForm(FlaskForm):
-    user_id = SelectField(
+    user_id: SelectField = SelectField(
         "Select Existing User",
         validators=[DataRequired(message="Please select a user for this truck.")],
     )
     truck_current_location = StringField(
         "Current location from ", validators=[DataRequired()]
     )  # Auto GPS detection in future
-    vehicle_registration_number = StringField(
+    vehicle_registration_number: StringField = StringField(
         "Registration number", validators=[DataRequired(), Length(min=9, max=10)]
     )
     vehicle_model_name = SelectField(

@@ -7,7 +7,7 @@ from wtforms import (
     DateField,
     SubmitField,
 )
-from wtforms.validators import DataRequired, Length
+from wtforms.validators import DataRequired, Length, Optional
 
 VEHICLE_TYPE_CHOICES = [
     ("open", "Open"),
@@ -29,7 +29,12 @@ LOAD_TYPE_CHOICES = [
 ]
 
 
-class LoadRegistrationForm(FlaskForm):
+class LoadScheduleForm(FlaskForm):
+    user_id: SelectField = SelectField(
+        "Select Existing User",
+        validators=[DataRequired(message="Please select a user for this truck.")],
+    )
+
     pickup_location = StringField("Pickup Location", validators=[DataRequired()])
     pickup_datetime = DateField("Pickup date", validators=[DataRequired()])
     pickup_contact_name = StringField("Full Name", validators=[Length(min=2, max=80)])
@@ -56,4 +61,8 @@ class LoadRegistrationForm(FlaskForm):
     )
 
     request_truck = SubmitField("Request Lorry")
+    admin_notes = TextAreaField(
+        "Admin Notes",
+        validators=[Optional(), Length(max=1000)],
+    )
     submit = SubmitField("Register the Material")

@@ -1,0 +1,308 @@
+{% extends "admin/master.html" %}
+
+{% block head_css %}
+    {{ super() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_schedule_load.css') }}">
+{% endblock %}
+
+{% block body %}
+
+<div class="schedule-load-page">
+
+    <div class="page-header-card">
+        <div>
+            <h2 class="page-title">Schedule New Load</h2>
+            <p class="page-subtitle">
+                Select an existing customer or create a new one, then enter pickup, drop, and load details.
+            </p>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-center">
+        <div class="form-card" style="max-width: 1100px; width: 100%;">
+
+            <form method="POST" class="bg-light p-4 custom-form-card" novalidate>
+                {{ form.hidden_tag() }}
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="mb-3">
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }}">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+
+                <div class="d-flex flex-column gap-2">
+
+                    <!-- Customer Section -->
+                    <div class="customer-container p-4 mb-4">
+
+                        <div class="container-fluid d-flex justify-content-between align-items-center mb-4 py-2">
+                            <div>
+                                <h4 class="m-0">Customer Information</h4>
+                                <small class="text-muted">
+                                    Select an existing user or create a new customer below.
+                                </small>
+                            </div>
+
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="toggleNewUserFields()">
+                                Toggle New User
+                            </button>
+                        </div>
+
+                        <div class="row g-4">
+
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    {{ form.user_id(class="form-select", id="user_id", onchange="onUserChange()") }}
+                                    <label for="user_id" class="form-label">Select Existing User</label>
+                                </div>
+
+                                {% for error in form.user_id.errors %}
+                                    <div class="text-danger small mt-1">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="col-12">
+                                <div id="selected-user-preview" class="selected-user-preview d-none">
+                                    <strong>Selected User:</strong>
+                                    <span id="preview-user-name"></span>
+                                    <span id="preview-user-phone"></span>
+                                    <span id="preview-user-email"></span>
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                    </div>
+
+                    <!-- Pickup and Drop Section -->
+                    <div class="d-flex pickup-drop-wrapper">
+
+                        <div class="pickup-container p-4 mb-4 flex-fill">
+                            <div class="container-fluid d-flex justify-content-between align-items-center mb-4 py-2">
+                                <h4 class="m-0">Pickup Information</h4>
+
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="autoFillUser()">
+                                    Same as User
+                                </button>
+                            </div>
+
+                            <div class="row g-4">
+
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        {{ form.pickup_location(class="form-control", placeholder="PickUp Location") }}
+                                        <label for="pickup_location" class="form-label">PickUp Location</label>
+                                    </div>
+
+                                    {% for error in form.pickup_location.errors %}
+                                        <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        {{ form.pickup_datetime(class="form-control") }}
+                                        <label for="pickup_datetime" class="form-label">PickUp Date</label>
+                                    </div>
+
+                                    {% for error in form.pickup_datetime.errors %}
+                                        <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label m-2">PickUp Contacts</label>
+
+                                    <div class="row g-2">
+                                        <div class="col-md-6">
+                                            {{ form.pickup_contact_name(class="form-control", placeholder="Name") }}
+
+                                            {% for error in form.pickup_contact_name.errors %}
+                                                <div class="text-danger small mt-1">{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            {{ form.pickup_contact_phone(class="form-control", placeholder="Phone Number") }}
+
+                                            {% for error in form.pickup_contact_phone.errors %}
+                                                <div class="text-danger small mt-1">{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="drop-container p-4 mb-4 flex-fill">
+
+                            <h4 class="p-2 mb-4">Drop Information</h4>
+
+                            <div class="row g-4">
+
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        {{ form.drop_location(class="form-control", placeholder="Drop Location") }}
+                                        <label for="drop_location" class="form-label">Drop Location</label>
+                                    </div>
+
+                                    {% for error in form.drop_location.errors %}
+                                        <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        {{ form.drop_datetime(class="form-control") }}
+                                        <label for="drop_datetime" class="form-label">Drop Date</label>
+                                    </div>
+
+                                    {% for error in form.drop_datetime.errors %}
+                                        <div class="text-danger small mt-1">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label mb-2">Drop Contacts</label>
+
+                                    <div class="row g-2">
+                                        <div class="col-md-6">
+                                            {{ form.drop_contact_name(class="form-control", placeholder="Name") }}
+
+                                            {% for error in form.drop_contact_name.errors %}
+                                                <div class="text-danger small mt-1">{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            {{ form.drop_contact_phone(class="form-control", placeholder="Phone Number") }}
+
+                                            {% for error in form.drop_contact_phone.errors %}
+                                                <div class="text-danger small mt-1">{{ error }}</div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Load Details -->
+                    <div class="material-container p-4 mb-4">
+
+                        <h4 class="mb-4">Load Details</h4>
+
+                        <div class="row g-4">
+
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    {{ form.load_weight(class="form-control", placeholder="Estimated material weight") }}
+                                    <label for="load_weight" class="form-label">Estimated Material Weight</label>
+                                </div>
+
+                                {% for error in form.load_weight.errors %}
+                                    <div class="text-danger small mt-1">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    {{ form.vehicle_type(class="form-select", placeholder="Type of truck") }}
+                                    <label for="vehicle_type" class="form-label">Type of Truck</label>
+                                </div>
+
+                                {% for error in form.vehicle_type.errors %}
+                                    <div class="text-danger small mt-1">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    {{ form.load_type(class="form-control", placeholder="Type of Materials in load") }}
+                                    <label for="load_type" class="form-label">Type of Materials in Load</label>
+                                </div>
+
+                                {% for error in form.load_type.errors %}
+                                    <div class="text-danger small mt-1">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    {{ form.load_details(class="form-control", style="height: 100px", placeholder="Material description") }}
+                                    <label for="load_details" class="form-label">Material Description</label>
+                                </div>
+
+                                {% for error in form.load_details.errors %}
+                                    <div class="text-danger small mt-1">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- Assignment Section -->
+                    <!-- <div class="assignment-container p-4 mb-4"> -->
+                    <!---->
+                    <!--     <h4 class="mb-4">Truck Assignment</h4> -->
+                    <!---->
+                    <!--     <div class="row g-4"> -->
+                    <!---->
+                    <!--         <div class="col-12"> -->
+                    <!--             <div class="form-floating"> -->
+                    <!--                 <label for="assigned_truck_id">Assign Truck</label> -->
+                    <!--             </div> -->
+                    <!---->
+                    <!--             <small class="text-muted"> -->
+                    <!--                 Leave this as "Assign later" if you want to schedule the load first. -->
+                    <!--             </small> -->
+                    <!---->
+                    <!--         </div> -->
+                    <!---->
+                    <!--     </div> -->
+                    <!---->
+                    <!-- </div> -->
+
+                    <!-- Admin Notes -->
+                    <div class="notes-container p-4 mb-4">
+
+                        <h4 class="mb-4">Admin Notes</h4>
+
+                        <div class="form-floating">
+                            {{ form.admin_notes(class="form-control", style="height: 110px", placeholder="Internal notes") }}
+                            <label for="admin_notes">Internal Notes</label>
+                        </div>
+
+                        {% for error in form.admin_notes.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+
+                    </div>
+
+                    <div class="col-12 text-center">
+                        {{ form.submit(class="btn btn-primary btn-lg mt-3 w-50") }}
+                    </div>
+
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+
+
+{% endblock %}

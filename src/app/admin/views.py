@@ -1,13 +1,15 @@
 from __future__ import annotations
 
+from datetime import datetime, time
+from typing import Any
 from flask import abort, flash, redirect, request, url_for
 from flask_admin.contrib.sqla import ModelView
-from flask_admin import AdminIndexView, expose
+from flask_admin import AdminIndexView, BaseView, expose
 from flask_login import current_user
-from typing import Any
+from sqlalchemy import func, select
 
 from app.forms.trucks import TruckRegistrationForm
-from app.models import User, Truck
+from app.models import User, Truck, Load
 from app.extensions import db
 
 
@@ -34,7 +36,7 @@ class SecureModelView(ModelView):
         return abort(403)
 
 
-class AdminView(AdminIndexView):
+class AdminDashboardView(AdminIndexView):
     def is_accessible(self) -> bool:
         # current_user is a LocalProxy; treat as authenticated principal
         if not getattr(current_user, "is_authenticated", False):
@@ -52,7 +54,149 @@ class AdminView(AdminIndexView):
         # Logged in but not authorized
         return abort(403)
 
-    pass
+    @expose("/")
+    def index(self):
+        today_start = datetime.combine(datetime.utcnow().date(), time.min)
+        active_load_statuses = [
+            "PENDING",
+            "ASSIGNED",
+            "PICKED_UP",
+            "IN_TRANSIT",
+        ]
+
+        def count_scalar(statement: Any) -> int:
+            return int(db.session.scalar(statement) or 0)
+
+        total_users = count_scalar(select(func.count(User.id)))
+
+        # active_users = count_scalar(
+        #     select(func.count(User.id)).where(User.is_active.is_(True))
+        # )
+
+        new_users_today = count_scalar(
+            select(func.count(User.id)).where(User.created_at >= today_start)
+        )
+
+        total_trucks = count_scalar(select(func.count(Truck.id)))
+
+        available_trucks = count_scalar(
+            select(func.count(Truck.id)).where(Truck.is_available.is_(True))
+        )
+
+        busy_trucks = max(total_trucks - available_trucks, 0)
+
+        total_loads = count_scalar(select(func.count(Load.id)))
+
+        # active_loads = count_scalar(
+        #     select(func.count(Load.id)).where(Load.status.in_(active_load_statuses))
+        # )
+        #
+        # pending_loads = count_scalar(
+        #     select(func.count(Load.id)).where(Load.status == "PENDING")
+        # )
+        #
+        # assigned_loads = count_scalar(
+        #     select(func.count(Load.id)).where(Load.status == "ASSIGNED")
+        # )
+        #
+        # in_transit_loads = count_scalar(
+        #     select(func.count(Load.id)).where(Load.status == "IN_TRANSIT")
+        # )
+        #
+        # completed_loads = count_scalar(
+        #     select(func.count(Load.id)).where(Load.status == "DELIVERED")
+        # )
+        #
+        # cancelled_loads = count_scalar(
+        #     select(func.count(Load.id)).where(Load.status == "CANCELLED")
+        # )
+
+        # loads_without_truck = count_scalar(
+        #     select(func.count(Load.id)).where(
+        #         Load.truck_id.is_(None),
+        #         Load.status.in_(["PENDING", "ASSIGNED"]),
+        #     )
+        # )
+
+        # load_status_rows = db.session.execute(
+        #     select(
+        #         Load.status,
+        #         func.count(Load.id),
+        #     )
+        #     .group_by(Load.status)
+        #     .order_by(Load.status)
+        # ).all()
+
+        # load_status_counts = {
+        #     str(status): int(total) for status, total in load_status_rows
+        # }
+
+        # recent_loads = db.session.scalars(
+        #     select(Load).order_by(Load.created_at.desc()).limit(10)
+        # ).all()
+
+        # recent_logs = db.session.scalars(
+        #     select(ActivityLog).order_by(ActivityLog.created_at.desc()).limit(30)
+        # ).all()
+
+        available_truck_list = db.session.scalars(
+            select(Truck)
+            .where(Truck.is_available.is_(True))
+            .order_by(Truck.id.desc())
+            .limit(10)
+        ).all()
+
+        alerts: list[dict[str, str]] = []
+
+        # if loads_without_truck > 0:
+        #     alerts.append(
+        #         {
+        #             "level": "danger",
+        #             "title": "Loads need truck assignment",
+        #             "message": f"{loads_without_truck} active load(s) do not have a truck assigned.",
+        #         }
+        #     )
+
+        if available_trucks == 0:
+            alerts.append(
+                {
+                    "level": "warning",
+                    "title": "No available trucks",
+                    "message": "There are currently no available trucks for new load assignment.",
+                }
+            )
+
+        # if pending_loads > 0 and available_trucks > 0:
+        #     alerts.append(
+        #         {
+        #             "level": "info",
+        #             "title": "Matching opportunity",
+        #             "message": f"{pending_loads} pending load(s) can be matched with {available_trucks} available truck(s).",
+        #         }
+        #     )
+
+        dashboard_data = {
+            "total_users": total_users,
+            "active_users": "",
+            "new_users_today": new_users_today,
+            "total_trucks": total_trucks,
+            "available_trucks": available_trucks,
+            "busy_trucks": busy_trucks,
+            "total_loads": total_loads,
+            "active_loads": "",
+            "pending_loads": "",
+            "assigned_loads": "",
+            "in_transit_loads": "",
+            "completed_loads": "",
+            "cancelled_loads": "",
+            "loads_without_truck": "",
+            "load_status_counts": "",
+            "recent_loads": "",
+            "recent_logs": "",
+            "available_truck_list": available_truck_list,
+            "alerts": alerts,
+        }
+        return self.render("/admin/custom_dashboard.html", dashboard=dashboard_data)
 
 
 class UserAdminView(SecureModelView):
@@ -104,7 +248,7 @@ class UserAdminView(SecureModelView):
     #     return super().get_count_query()
 
 
-class TruckAdminView(ModelView):
+class TruckAdminView(SecureModelView):
     create_template = "testing.html"
     column_list = (
         "truck_id",
@@ -174,19 +318,22 @@ class TruckAdminView(ModelView):
                         if form.vehicle_model_name.data != "Other"
                         else form.other_vehicle_model_name.data
                     )
-                    print(form.vehicle_capacity.data)
                     truck = Truck(
                         user_id=selected_user.id,
                         # Vehical info
                         current_location=form.truck_current_location.data or "",
-                        vehicle_registration_number=form.vehicle_registration_number.data,
+                        vehicle_registration_number=(
+                            form.vehicle_registration_number.data or ""
+                        )
+                        .upper()
+                        .replace(" ", ""),
                         vehicle_type=form.vehicle_type.data,
-                        vehicle_capacity=form.vehicle_capacity.data,
-                        vehicle_model_name=vehicle_model_name,
+                        vehicle_capacity=float(form.vehicle_capacity.data or 0.0),
+                        vehicle_model_name=vehicle_model_name or "",
                         # Owner info
-                        truck_owner_name=form.truck_owner_name.data,
-                        truck_owner_phone=form.truck_owner_phone.data,
-                        truck_owner_aadhaar=form.truck_owner_aadhaar.data,
+                        truck_owner_name=form.truck_owner_name.data or "",
+                        truck_owner_phone=form.truck_owner_phone.data or "",
+                        truck_owner_aadhaar=form.truck_owner_aadhaar.data or "",
                         truck_owner_pan=form.truck_owner_pan.data,
                         # Driver info
                         truck_driver_name=form.truck_driver_name.data,
