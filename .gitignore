@@ -21,7 +21,8 @@ build/
 logs/*.log.*
 logs/*.log
 
-migrations/
+migrations
+migrations/*.py
 
 # Env
 .env
