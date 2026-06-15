@@ -3,11 +3,10 @@ from __future__ import annotations
 from flask import Flask
 
 from app.admin.load_view import LoadModelView
+from app.admin.truck_view import TruckAdminView
 from app.extensions import admin, db
 from app.admin.views import (
     AdminDashboardView,
-    SecureModelView,
-    TruckAdminView,
     UserAdminView,
 )
 from app.models import User, Load, Truck

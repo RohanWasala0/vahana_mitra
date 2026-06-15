@@ -984,6 +984,7 @@ dependencies = [
     { name = "psycopg", extra = ["binary"] },
     { name = "python-dotenv" },
     { name = "sqlalchemy" },
+    { name = "wtforms" },
 ]
 
 [package.dev-dependencies]
@@ -1016,6 +1017,7 @@ requires-dist = [
     { name = "psycopg", extras = ["binary"], specifier = ">=3.2,<4.0" },
     { name = "python-dotenv", specifier = ">=1.0,<2.0" },
     { name = "sqlalchemy", specifier = ">=2.0,<3.0" },
+    { name = "wtforms", specifier = ">=3.2.1" },
 ]
 
 [package.metadata.requires-dev]

@@ -2,89 +2,114 @@
 
 {% block head_css %}
     {{ super() }}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_schedule_load.css') }}">
+    <link rel="stylesheet" href="/static/admin_style.css">
 {% endblock %}
 
 {% block body %}
 
-<div class="schedule-load-page">
 
-    <div class="page-header-card">
-        <div>
-            <h2 class="page-title">Schedule New Load</h2>
-            <p class="page-subtitle">
-                Select an existing customer or create a new one, then enter pickup, drop, and load details.
-            </p>
-        </div>
+<div class="vm-page-wrapper">
+<div class="vm-form-card">
+
+    <div class="vm-card-header">
+        <h2>Register New Truck</h2>
+        <p>Select an existing customer or create a new one, then enter pickup, drop, and load details.</p>
     </div>
 
-    <div class="d-flex justify-content-center">
-        <div class="form-card" style="max-width: 1100px; width: 100%;">
+    <div class="vm-form-body">
+    <form method="POST" novalidate>
+        {{ form.hidden_tag() }}
 
-            <form method="POST" class="bg-light p-4 custom-form-card" novalidate>
-                {{ form.hidden_tag() }}
+        <div class="vm-section">
+        <div class="vm-section-title">User Register the Truck Under</div>
 
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                        <div class="mb-3">
-                            {% for category, message in messages %}
-                                <div class="alert alert-{{ category }}">
-                                    {{ message }}
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                {% endwith %}
-
-                <div class="d-flex flex-column gap-2">
-
-                    <!-- Customer Section -->
-                    <div class="customer-container p-4 mb-4">
-
-                        <div class="container-fluid d-flex justify-content-between align-items-center mb-4 py-2">
-                            <div>
-                                <h4 class="m-0">Customer Information</h4>
-                                <small class="text-muted">
-                                    Select an existing user or create a new customer below.
-                                </small>
-                            </div>
-
-                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="toggleNewUserFields()">
-                                Toggle New User
-                            </button>
-                        </div>
-
-                        <div class="row g-4">
-
-                            <div class="col-12">
-                                <div class="form-floating">
-                                    {{ form.user_id(class="form-select", id="user_id", onchange="onUserChange()") }}
-                                    <label for="user_id" class="form-label">Select Existing User</label>
-                                </div>
-
-                                {% for error in form.user_id.errors %}
-                                    <div class="text-danger small mt-1">{{ error }}</div>
-                                {% endfor %}
-                            </div>
-
-                            <div class="col-12">
-                                <div id="selected-user-preview" class="selected-user-preview d-none">
-                                    <strong>Selected User:</strong>
-                                    <span id="preview-user-name"></span>
-                                    <span id="preview-user-phone"></span>
-                                    <span id="preview-user-email"></span>
-                                </div>
-                            </div>
-
-
-                        </div>
-
+            <div class="row g-3 align-items-center">
+            <div class="col-md-8 mb-3">
+                <label class="form-label"> Select User <span class="vm-required">*</span></label>
+                {{ form.user_id(class="form-control " + ("is-invalid" if form.user_id.errors else ""),id="user_id") }}
+                {% if form.user_id.errors %}
+                    <div class="invalid-feedback">
+                    {% for error in form.user_id.errors %}
+                        {{ error }}
+                    {% endfor %}
                     </div>
+                {% endif %}
+                <div class="vm-help-text">
+                             When you select a user, owner name, phone, Aadhaar, and PAN will auto-fill below.
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+            <div class="vm-user-action-box">
+            <div class="form-check">
+                <input
+                    class="form-check-input"
+                    type="checkbox"
+                    value="1"
+                    id="make_new_user"
+                    name="make_new_user">
+                <label class="form-check-label" for="make_new_user">Register truck under a new user</label>
+            </div>
+            <button
+                type="submit"
+                class="btn btn-outline-primary btn-sm mt-3">Go to User Create Page</button>
+            </div>
+            </div>
+            </div>
+        </div>
 
+        <div class="vm-section container-wrapper">
+        <div class="vm-section-title">Route Information</div>
+            <div class="container p-4 mb-4 flex-fill me-3">
+            <div class="row g-4 align-items-center">
+                <div class="col-md-6 mb-3">
+                <label class="form-label">
+                    Pickup Location <span class="vm-help-text"> Have to code it take a proper location input</span>
+                    {% if form.pickup_location.flags.required %}
+                        <span class="vm-required">*</span>
+                    {% endif %}
+                </label>
+                {{ form.pickup_location(class="form-control " + ("is-invalid" if form.pickup_location.errors else "")) }}
+                {% if form.pickup_location.errors %}
+                    <div class="invalid-feedback">
+                        {% for error in form.pickup_location.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                </div>
+            </div>
+            </div>    
+
+            <div class="container p-4 mb-4 flex-fill ms-3">
+            <div class="row g-4 align-items-center">
+
+                <div class="col-md-6 mb-3">
+                <label class="form-label">
+                    Pickup Location <span class="vm-help-text"> Have to code it take a proper location input</span>
+                    {% if form.pickup_location.flags.required %}
+                        <span class="vm-required">*</span>
+                    {% endif %}
+                </label>
+                {{ form.pickup_location(class="form-control " + ("is-invalid" if form.pickup_location.errors else "")) }}
+                {% if form.pickup_location.errors %}
+                    <div class="invalid-feedback">
+                        {% for error in form.pickup_location.errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                </div>
+            </div>
+            </div>
+        </div>
+        </div>
+
+</div>
+</div>
+        
                     <!-- Pickup and Drop Section -->
-                    <div class="d-flex pickup-drop-wrapper">
-
-                        <div class="pickup-container p-4 mb-4 flex-fill">
+        <div class="d-flex container-wrapper">
+        <div class="container p-4 mb-4 flex-fill">
                             <div class="container-fluid d-flex justify-content-between align-items-center mb-4 py-2">
                                 <h4 class="m-0">Pickup Information</h4>
 

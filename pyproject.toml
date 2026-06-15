@@ -16,6 +16,7 @@ dependencies = [
     "flask-login>=0.6.3",
     "flask-security[babel,common,fsqla]>=5.8.0",
     "helpers>=0.2.0",
+    "wtforms>=3.2.1",
 ]
 
 [dependency-groups]
@@ -67,6 +68,8 @@ check_untyped_defs = true
 warn_return_any = true
 warn_unused_ignores = true
 strict_equality = true
+plugins = ["sqlalchemy.ext.mypy.plugin"]
+
 
 # Third-party libs may have partial typing; keep core strictness but avoid noise.
 [[tool.mypy.overrides]]

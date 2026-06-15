@@ -54,25 +54,36 @@ class LoadModelView(SecureModelView):
 
                 else:
                     new_load = Load(
-                        user_id=selected_user,
-                        pickup_location=form.pickup_location.data.strip(),
+                        user_id=selected_user.id,
+                        pickup_location=(
+                            loc.strip()
+                            if (loc := form.pickup_location.data) is not None
+                            else ""
+                        ),
                         pickup_datetime=form.pickup_datetime.data,
-                        pickup_contact_name=form.pickup_contact_name.data.strip(),
-                        pickup_contact_phone=form.pickup_contact_phone.data.strip(),
-                        drop_location=form.drop_location.data.strip(),
+                        pickup_contact_name=form.pickup_contact_name.data or "",
+                        pickup_contact_phone=form.pickup_contact_phone.data or "",
+                        drop_location=form.drop_location.data or "",
                         drop_datetime=form.drop_datetime.data,
-                        drop_contact_name=form.drop_contact_name.data.strip(),
-                        drop_contact_phone=form.drop_contact_phone.data.strip(),
-                        load_weight=form.load_weight.data,
-                        vehicle_type=form.vehicle_type.data,
+                        drop_contact_name=form.drop_contact_name.data or "",
+                        drop_contact_phone=form.drop_contact_phone.data or "",
+                        load_weight=form.load_weight.data or 0.0,
+                        # vehicle_type=form.vehicle_type.data,
+                        load_current_location="",
                         load_type=form.load_type.data.strip(),
                         load_details=form.load_details.data.strip()
                         if form.load_details.data
                         else None,
-                        admin_notes=form.admin_notes.data.strip()
-                        if form.admin_notes.data
-                        else None,
+                        is_active=True,
+                        in_progress=False,
+                        # admin_notes=form.admin_notes.data.strip()
+                        # if form.admin_notes.data
+                        # else None,
                     )
+
+                    db.session.add(new_load)
+                    db.session.commit()
+                    return redirect(return_url)
 
         return self.render(
             template=self.create_template, return_url=return_url, form=form

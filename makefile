@@ -26,9 +26,13 @@ db-migrate:
 	uv run flask --app app:create_app db migrate -m "$(MSG)"
 	uv run flask --app app:create_app db upgrade
 
-add-dummyUsers:
+cli-addDummyUsers:
 	@if [-z $(N)]; then echo "N is required. Example: make add-dummyUsers N=50"; exit 1; fi
 	# Ensure DB is migrated first
 	uv run flask --app app:create_app db upgrade
 	# Seed dummy rows
 	uv run flask --app app:create_app seed-db --users $(N)
+
+cli-reSeedUsers:
+	uv run flask --app app:create_app db upgrade
+	uv run flask --app app:create_app seed-db --reset

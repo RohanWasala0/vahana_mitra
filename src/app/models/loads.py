@@ -28,11 +28,11 @@ class Load(db.Model):
     # Cargo details
     load_type: Mapped[str] = mapped_column(String, nullable=False)
     load_weight: Mapped[float] = mapped_column(Float, nullable=False)
-    load_details: Mapped[str] = mapped_column(String, nullable=True)
+    load_details: Mapped[str | None] = mapped_column(String, nullable=True)
     load_current_location: Mapped[str] = mapped_column(String, nullable=False)
 
     # Status and cost
-    cost: Mapped[float] = mapped_column(Float, nullable=True)
+    cost: Mapped[float | None] = mapped_column(Float, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     in_progress: Mapped[bool] = mapped_column(Boolean, default=False)
 
@@ -49,3 +49,41 @@ class Load(db.Model):
             query = query.filter(cls.pickup_location.ilike(f"%{current_location}%"))
 
         return query.all()
+
+    def __init__(
+        self,
+        *,
+        user_id: int,
+        pickup_location: str,
+        pickup_datetime: datetime,
+        pickup_contact_name: str,
+        pickup_contact_phone: str,
+        drop_location: str,
+        drop_datetime: datetime,
+        drop_contact_name: str,
+        drop_contact_phone: str,
+        load_type: str,
+        load_weight: float,
+        load_details: str | None = None,
+        load_current_location: str,
+        cost: int | None = None,
+        is_active: bool,
+        in_progress: bool,
+    ) -> None:
+
+        self.user_id = user_id
+        self.pickup_location = pickup_location
+        self.pickup_datetime = pickup_datetime
+        self.pickup_contact_name = pickup_contact_name
+        self.pickup_contact_phone = pickup_contact_phone
+        self.drop_location = drop_location
+        self.drop_datetime = drop_datetime
+        self.drop_contact_name = drop_contact_name
+        self.drop_contact_phone = drop_contact_phone
+        self.load_type = load_type
+        self.load_weight = load_weight
+        self.load_details = load_details
+        self.load_current_location = load_current_location
+        self.cost = cost
+        self.is_active = is_active
+        self.in_progress = in_progress
