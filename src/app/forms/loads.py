@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import (
+    BooleanField,
     SelectField,
     IntegerField,
     StringField,
@@ -34,11 +35,18 @@ class LoadScheduleForm(FlaskForm):
         "Select Existing User",
         validators=[DataRequired(message="Please select a user for this truck.")],
     )
+    scheduling_compan: BooleanField = BooleanField()
 
     pickup_location = StringField("Pickup Location", validators=[DataRequired()])
     pickup_datetime = DateField("Pickup date", validators=[DataRequired()])
-    pickup_contact_name = StringField("Full Name", validators=[Length(min=2, max=80)])
-    pickup_contact_phone = StringField("Phone Number", validators=[Length(min=10)])
+    pickup_contact_name = StringField(
+        "Full Name", validators=[Length(min=2, max=80), DataRequired()]
+    )
+    pickup_contact_phone = StringField(
+        "Phone Number", validators=[Length(min=10), DataRequired()]
+    )
+    pickup_map_coordinates = StringField("Map Location")
+    pickup_instruction = StringField()
 
     drop_location = StringField("Drop Location", validators=[DataRequired()])
     drop_datetime = DateField("Drop date")

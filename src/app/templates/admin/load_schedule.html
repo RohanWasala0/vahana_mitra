@@ -1,333 +1,344 @@
 {% extends "admin/master.html" %}
-
 {% block head_css %}
-    {{ super() }}
-    <link rel="stylesheet" href="/static/admin_style.css">
+  {{ super() }}
+  <link rel="stylesheet" href="/static/admin_style.css">
 {% endblock %}
-
 {% block body %}
-
-
-<div class="vm-page-wrapper">
-<div class="vm-form-card">
-
-    <div class="vm-card-header">
+  <div class="vm-page-wrapper">
+    <div class="vm-form-card">
+      <div class="vm-card-header">
         <h2>Register New Truck</h2>
         <p>Select an existing customer or create a new one, then enter pickup, drop, and load details.</p>
-    </div>
-
-    <div class="vm-form-body">
-    <form method="POST" novalidate>
-        {{ form.hidden_tag() }}
-
-        <div class="vm-section">
-        <div class="vm-section-title">User Register the Truck Under</div>
-
+      </div>
+      <div class="vm-form-body">
+        <form method="POST" novalidate>
+          {{ form.hidden_tag() }}
+          <div class="vm-section">
+            <div class="vm-section-title">User Register the Truck Under</div>
             <div class="row g-3 align-items-center">
-            <div class="col-md-8 mb-3">
+              <div class="col-md-8 mb-3">
                 <label class="form-label"> Select User <span class="vm-required">*</span></label>
-                {{ form.user_id(class="form-control " + ("is-invalid" if form.user_id.errors else ""),id="user_id") }}
+                {{ form.user_id(class="form-control " + ("is-invalid" if form.user_id.errors else "") ,id="user_id") }}
                 {% if form.user_id.errors %}
-                    <div class="invalid-feedback">
+                  <div class="invalid-feedback">
                     {% for error in form.user_id.errors %}
-                        {{ error }}
+                      {{ error }}
                     {% endfor %}
-                    </div>
+                  </div>
                 {% endif %}
-                <div class="vm-help-text">
-                             When you select a user, owner name, phone, Aadhaar, and PAN will auto-fill below.
+                <div class="vm-help-text">When you select a user, owner name, phone, Aadhaar, and PAN will auto-fill below.</div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <div class="vm-user-action-box">
+                  <div class="form-check">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           value="1"
+                           id="make_new_user"
+                           name="make_new_user">
+                    <label class="form-check-label" for="make_new_user">Register truck under a new user</label>
+                  </div>
+                  <button type="submit" class="btn btn-outline-primary btn-sm mt-3">Go to User Create Page</button>
                 </div>
+              </div>
             </div>
-            <div class="col-md-4 mb-3">
-            <div class="vm-user-action-box">
-            <div class="form-check">
-                <input
-                    class="form-check-input"
-                    type="checkbox"
-                    value="1"
-                    id="make_new_user"
-                    name="make_new_user">
-                <label class="form-check-label" for="make_new_user">Register truck under a new user</label>
-            </div>
-            <button
-                type="submit"
-                class="btn btn-outline-primary btn-sm mt-3">Go to User Create Page</button>
-            </div>
-            </div>
-            </div>
-        </div>
-
-        <div class="vm-section container-wrapper">
-        <div class="vm-section-title">Route Information</div>
-            <div class="container p-4 mb-4 flex-fill me-3">
-            <div class="row g-4 align-items-center">
-                <div class="col-md-6 mb-3">
-                <label class="form-label">
-                    Pickup Location <span class="vm-help-text"> Have to code it take a proper location input</span>
-                    {% if form.pickup_location.flags.required %}
+          </div>
+          <div class="vm-section">
+            <div class="vm-section-title">Route Information</div>
+            <div class="container-wrapper d-flex">
+              <div class="container-styles p-4 mb-4 flex-fill me-3">
+                <div class="row g-4 align-items-center">
+                  <div class="col-12 mb-3">
+                    <label class="form-label">
+                      Pickup Location <span class="vm-help-text">Have to code it take a proper location input</span>
+                      {% if form.pickup_location.flags.required %}
                         <span class="vm-required">*</span>
-                    {% endif %}
-                </label>
-                {{ form.pickup_location(class="form-control " + ("is-invalid" if form.pickup_location.errors else "")) }}
-                {% if form.pickup_location.errors %}
-                    <div class="invalid-feedback">
+                      {% endif %}
+                    </label>
+                    {{ form.pickup_location(class="form-control " + ("is-invalid" if form.pickup_location.errors else "") ) }}
+                    {% if form.pickup_location.errors %}
+                      <div class="invalid-feedback">
                         {% for error in form.pickup_location.errors %}
-                            {{ error }}
+                          {{ error }}
                         {% endfor %}
-                    </div>
-                {% endif %}
-                </div>
-            </div>
-            </div>    
-
-            <div class="container p-4 mb-4 flex-fill ms-3">
-            <div class="row g-4 align-items-center">
-
-                <div class="col-md-6 mb-3">
-                <label class="form-label">
-                    Pickup Location <span class="vm-help-text"> Have to code it take a proper location input</span>
-                    {% if form.pickup_location.flags.required %}
+                      </div>
+                    {% endif %}
+                  </div>
+                  <div class="col-12 mb-3">
+                    <label class="form-label">
+                      Pickup Date
+                      {% if form.pickup_location.flags.required %}
                         <span class="vm-required">*</span>
+                      {% endif %}
+                    </label>
+                    {{ form.pickup_datetime(class="form-control " + ("is-invalid" if form.pickup_datetime.errors else "") ) }}
+                    {% if form.pickup_datetime.errors %}
+                      <div class="invalid-feedback">
+                        {% for error in form.pickup_datetime.errors %}
+                          {{ error }}
+                        {% endfor %}
+                      </div>
                     {% endif %}
-                </label>
-                {{ form.pickup_location(class="form-control " + ("is-invalid" if form.pickup_location.errors else "")) }}
-                {% if form.pickup_location.errors %}
-                    <div class="invalid-feedback">
-                        {% for error in form.pickup_location.errors %}
-                            {{ error }}
-                        {% endfor %}
+                  </div>
+                  <div class="col-12 mb-3">
+                    <label class="form-label">Pickup Contacts</label>
+                    <div class="row g-2">
+                      <div class="col-md-6">
+                        {{ form.pickup_contact_name(placeholder="Name" ,class="form-control " + ("is-invalid" if form.pickup_contact_name.errors else "") ) }}
+                        {% if form.pickup_contact_name.errors %}
+                          <div class="invalid-feedback">
+                            {% for error in form.pickup_contact_name.errors %}
+                              {{ error }}
+                            {% endfor %}
+                          </div>
+                        {% endif %}
+                      </div>
+                      <div class="col-md-6">
+                        {{ form.pickup_contact_phone(placeholder="Phone Numnber", class="form-control " + ("is-invalid" if form.pickup_contact_name.errors else "") ) }}
+                        {% if form.pickup_contact_phone.errors %}
+                          <div class="invalid-feedback">
+                            {% for error in form.pickup_contact_phone.errors %}
+                              {{ error }}
+                            {% endfor %}
+                          </div>
+                        {% endif %}
+                      </div>
                     </div>
-                {% endif %}
+                  </div>
                 </div>
-            </div>
-            </div>
-        </div>
-        </div>
-
-</div>
-</div>
-        
-                    <!-- Pickup and Drop Section -->
-        <div class="d-flex container-wrapper">
-        <div class="container p-4 mb-4 flex-fill">
-                            <div class="container-fluid d-flex justify-content-between align-items-center mb-4 py-2">
-                                <h4 class="m-0">Pickup Information</h4>
-
-                                <button type="button" class="btn btn-secondary btn-sm" onclick="autoFillUser()">
-                                    Same as User
-                                </button>
-                            </div>
-
-                            <div class="row g-4">
-
-                                <div class="col-12">
-                                    <div class="form-floating">
-                                        {{ form.pickup_location(class="form-control", placeholder="PickUp Location") }}
-                                        <label for="pickup_location" class="form-label">PickUp Location</label>
-                                    </div>
-
-                                    {% for error in form.pickup_location.errors %}
-                                        <div class="text-danger small mt-1">{{ error }}</div>
-                                    {% endfor %}
-                                </div>
-
-                                <div class="col-12">
-                                    <div class="form-floating">
-                                        {{ form.pickup_datetime(class="form-control") }}
-                                        <label for="pickup_datetime" class="form-label">PickUp Date</label>
-                                    </div>
-
-                                    {% for error in form.pickup_datetime.errors %}
-                                        <div class="text-danger small mt-1">{{ error }}</div>
-                                    {% endfor %}
-                                </div>
-
-                                <div class="col-12">
-                                    <label class="form-label m-2">PickUp Contacts</label>
-
-                                    <div class="row g-2">
-                                        <div class="col-md-6">
-                                            {{ form.pickup_contact_name(class="form-control", placeholder="Name") }}
-
-                                            {% for error in form.pickup_contact_name.errors %}
-                                                <div class="text-danger small mt-1">{{ error }}</div>
-                                            {% endfor %}
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            {{ form.pickup_contact_phone(class="form-control", placeholder="Phone Number") }}
-
-                                            {% for error in form.pickup_contact_phone.errors %}
-                                                <div class="text-danger small mt-1">{{ error }}</div>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-
-                        <div class="drop-container p-4 mb-4 flex-fill">
-
-                            <h4 class="p-2 mb-4">Drop Information</h4>
-
-                            <div class="row g-4">
-
-                                <div class="col-12">
-                                    <div class="form-floating">
-                                        {{ form.drop_location(class="form-control", placeholder="Drop Location") }}
-                                        <label for="drop_location" class="form-label">Drop Location</label>
-                                    </div>
-
-                                    {% for error in form.drop_location.errors %}
-                                        <div class="text-danger small mt-1">{{ error }}</div>
-                                    {% endfor %}
-                                </div>
-
-                                <div class="col-12">
-                                    <div class="form-floating">
-                                        {{ form.drop_datetime(class="form-control") }}
-                                        <label for="drop_datetime" class="form-label">Drop Date</label>
-                                    </div>
-
-                                    {% for error in form.drop_datetime.errors %}
-                                        <div class="text-danger small mt-1">{{ error }}</div>
-                                    {% endfor %}
-                                </div>
-
-                                <div class="col-12">
-                                    <label class="form-label mb-2">Drop Contacts</label>
-
-                                    <div class="row g-2">
-                                        <div class="col-md-6">
-                                            {{ form.drop_contact_name(class="form-control", placeholder="Name") }}
-
-                                            {% for error in form.drop_contact_name.errors %}
-                                                <div class="text-danger small mt-1">{{ error }}</div>
-                                            {% endfor %}
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            {{ form.drop_contact_phone(class="form-control", placeholder="Phone Number") }}
-
-                                            {% for error in form.drop_contact_phone.errors %}
-                                                <div class="text-danger small mt-1">{{ error }}</div>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <!-- Load Details -->
-                    <div class="material-container p-4 mb-4">
-
-                        <h4 class="mb-4">Load Details</h4>
-
-                        <div class="row g-4">
-
-                            <div class="col-md-4">
-                                <div class="form-floating">
-                                    {{ form.load_weight(class="form-control", placeholder="Estimated material weight") }}
-                                    <label for="load_weight" class="form-label">Estimated Material Weight</label>
-                                </div>
-
-                                {% for error in form.load_weight.errors %}
-                                    <div class="text-danger small mt-1">{{ error }}</div>
-                                {% endfor %}
-                            </div>
-
-                            <div class="col-md-4">
-                                <div class="form-floating">
-                                    {{ form.vehicle_type(class="form-select", placeholder="Type of truck") }}
-                                    <label for="vehicle_type" class="form-label">Type of Truck</label>
-                                </div>
-
-                                {% for error in form.vehicle_type.errors %}
-                                    <div class="text-danger small mt-1">{{ error }}</div>
-                                {% endfor %}
-                            </div>
-
-                            <div class="col-md-4">
-                                <div class="form-floating">
-                                    {{ form.load_type(class="form-control", placeholder="Type of Materials in load") }}
-                                    <label for="load_type" class="form-label">Type of Materials in Load</label>
-                                </div>
-
-                                {% for error in form.load_type.errors %}
-                                    <div class="text-danger small mt-1">{{ error }}</div>
-                                {% endfor %}
-                            </div>
-
-                            <div class="col-12">
-                                <div class="form-floating">
-                                    {{ form.load_details(class="form-control", style="height: 100px", placeholder="Material description") }}
-                                    <label for="load_details" class="form-label">Material Description</label>
-                                </div>
-
-                                {% for error in form.load_details.errors %}
-                                    <div class="text-danger small mt-1">{{ error }}</div>
-                                {% endfor %}
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                    <!-- Assignment Section -->
-                    <!-- <div class="assignment-container p-4 mb-4"> -->
-                    <!---->
-                    <!--     <h4 class="mb-4">Truck Assignment</h4> -->
-                    <!---->
-                    <!--     <div class="row g-4"> -->
-                    <!---->
-                    <!--         <div class="col-12"> -->
-                    <!--             <div class="form-floating"> -->
-                    <!--                 <label for="assigned_truck_id">Assign Truck</label> -->
-                    <!--             </div> -->
-                    <!---->
-                    <!--             <small class="text-muted"> -->
-                    <!--                 Leave this as "Assign later" if you want to schedule the load first. -->
-                    <!--             </small> -->
-                    <!---->
-                    <!--         </div> -->
-                    <!---->
-                    <!--     </div> -->
-                    <!---->
-                    <!-- </div> -->
-
-                    <!-- Admin Notes -->
-                    <div class="notes-container p-4 mb-4">
-
-                        <h4 class="mb-4">Admin Notes</h4>
-
-                        <div class="form-floating">
-                            {{ form.admin_notes(class="form-control", style="height: 110px", placeholder="Internal notes") }}
-                            <label for="admin_notes">Internal Notes</label>
-                        </div>
-
-                        {% for error in form.admin_notes.errors %}
-                            <div class="text-danger small mt-1">{{ error }}</div>
+              </div>
+              <div class="container-styles p-4 mb-4 flex-fill ms-3">
+                <div class="row g-4 align-items-center">
+                  <div class="col-12 mb-3">
+                    <label class="form-label">
+                      drop Location <span class="vm-help-text">Have to code it take a proper location input</span>
+                      {% if form.drop_location.flags.required %}
+                        <span class="vm-required">*</span>
+                      {% endif %}
+                    </label>
+                    {{ form.drop_location(class="form-control " + ("is-invalid" if form.drop_location.errors else "") ) }}
+                    {% if form.drop_location.errors %}
+                      <div class="invalid-feedback">
+                        {% for error in form.drop_location.errors %}
+                          {{ error }}
                         {% endfor %}
-
+                      </div>
+                    {% endif %}
+                  </div>
+                  <div class="col-12 mb-3">
+                    <label class="form-label">
+                      drop Date
+                      {% if form.drop_location.flags.required %}
+                        <span class="vm-required">*</span>
+                      {% endif %}
+                    </label>
+                    {{ form.drop_datetime(class="form-control " + ("is-invalid" if form.drop_datetime.errors else "") ) }}
+                    {% if form.drop_datetime.errors %}
+                      <div class="invalid-feedback">
+                        {% for error in form.drop_datetime.errors %}
+                          {{ error }}
+                        {% endfor %}
+                      </div>
+                    {% endif %}
+                  </div>
+                  <div class="col-12 mb-3">
+                    <label class="form-label">drop Contacts</label>
+                    <div class="row g-2">
+                      <div class="col-md-6">
+                        {{ form.drop_contact_name(placeholder="Name" ,class="form-control " + ("is-invalid" if form.drop_contact_name.errors else "") ) }}
+                        {% if form.drop_contact_name.errors %}
+                          <div class="invalid-feedback">
+                            {% for error in form.drop_contact_name.errors %}
+                              {{ error }}
+                            {% endfor %}
+                          </div>
+                        {% endif %}
+                      </div>
+                      <div class="col-md-6">
+                        {{ form.drop_contact_phone(placeholder="Phone Numnber", class="form-control " + ("is-invalid" if form.drop_contact_name.errors else "") ) }}
+                        {% if form.drop_contact_phone.errors %}
+                          <div class="invalid-feedback">
+                            {% for error in form.drop_contact_phone.errors %}
+                              {{ error }}
+                            {% endfor %}
+                          </div>
+                        {% endif %}
+                      </div>
                     </div>
-
-                    <div class="col-12 text-center">
-                        {{ form.submit(class="btn btn-primary btn-lg mt-3 w-50") }}
-                    </div>
-
+                  </div>
                 </div>
-            </form>
-
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
-
+    <!-- Pickup and Drop Section -->
+    <div class="d-flex container-wrapper">
+      <div class="container p-4 mb-4 flex-fill">
+        <div class="container-fluid d-flex justify-content-between align-items-center mb-4 py-2">
+          <h4 class="m-0">Pickup Information</h4>
+          <button type="button"
+                  class="btn btn-secondary btn-sm"
+                  onclick="autoFillUser()">Same as User</button>
+        </div>
+        <div class="row g-4">
+          <div class="col-12">
+            <div class="form-floating">
+              {{ form.pickup_location(class="form-control", placeholder="PickUp Location") }}
+              <label for="pickup_location" class="form-label">PickUp Location</label>
+            </div>
+            {% for error in form.pickup_location.errors %}
+              <div class="text-danger small mt-1">{{ error }}</div>
+            {% endfor %}
+          </div>
+          <div class="col-12">
+            <div class="form-floating">
+              {{ form.pickup_datetime(class="form-control") }}
+              <label for="pickup_datetime" class="form-label">PickUp Date</label>
+            </div>
+            {% for error in form.pickup_datetime.errors %}
+              <div class="text-danger small mt-1">{{ error }}</div>
+            {% endfor %}
+          </div>
+          <div class="col-12">
+            <label class="form-label m-2">PickUp Contacts</label>
+            <div class="row g-2">
+              <div class="col-md-6">
+                {{ form.pickup_contact_name(class="form-control", placeholder="Name") }}
+                {% for error in form.pickup_contact_name.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-md-6">
+                {{ form.pickup_contact_phone(class="form-control", placeholder="Phone Number") }}
+                {% for error in form.pickup_contact_phone.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="drop-container p-4 mb-4 flex-fill">
+        <h4 class="p-2 mb-4">Drop Information</h4>
+        <div class="row g-4">
+          <div class="col-12">
+            <div class="form-floating">
+              {{ form.drop_location(class="form-control", placeholder="Drop Location") }}
+              <label for="drop_location" class="form-label">Drop Location</label>
+            </div>
+            {% for error in form.drop_location.errors %}
+              <div class="text-danger small mt-1">{{ error }}</div>
+            {% endfor %}
+          </div>
+          <div class="col-12">
+            <div class="form-floating">
+              {{ form.drop_datetime(class="form-control") }}
+              <label for="drop_datetime" class="form-label">Drop Date</label>
+            </div>
+            {% for error in form.drop_datetime.errors %}
+              <div class="text-danger small mt-1">{{ error }}</div>
+            {% endfor %}
+          </div>
+          <div class="col-12">
+            <label class="form-label mb-2">Drop Contacts</label>
+            <div class="row g-2">
+              <div class="col-md-6">
+                {{ form.drop_contact_name(class="form-control", placeholder="Name") }}
+                {% for error in form.drop_contact_name.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
+              </div>
+              <div class="col-md-6">
+                {{ form.drop_contact_phone(class="form-control", placeholder="Phone Number") }}
+                {% for error in form.drop_contact_phone.errors %}
+                  <div class="text-danger small mt-1">{{ error }}</div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Load Details -->
+    <div class="material-container p-4 mb-4">
+      <h4 class="mb-4">Load Details</h4>
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="form-floating">
+            {{ form.load_weight(class="form-control", placeholder="Estimated material weight") }}
+            <label for="load_weight" class="form-label">Estimated Material Weight</label>
+          </div>
+          {% for error in form.load_weight.errors %}
+            <div class="text-danger small mt-1">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            {{ form.vehicle_type(class="form-select", placeholder="Type of truck") }}
+            <label for="vehicle_type" class="form-label">Type of Truck</label>
+          </div>
+          {% for error in form.vehicle_type.errors %}
+            <div class="text-danger small mt-1">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="col-md-4">
+          <div class="form-floating">
+            {{ form.load_type(class="form-control", placeholder="Type of Materials in load") }}
+            <label for="load_type" class="form-label">Type of Materials in Load</label>
+          </div>
+          {% for error in form.load_type.errors %}
+            <div class="text-danger small mt-1">{{ error }}</div>
+          {% endfor %}
+        </div>
+        <div class="col-12">
+          <div class="form-floating">
+            {{ form.load_details(class="form-control", style="height: 100px", placeholder="Material description") }}
+            <label for="load_details" class="form-label">Material Description</label>
+          </div>
+          {% for error in form.load_details.errors %}
+            <div class="text-danger small mt-1">{{ error }}</div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <!-- Assignment Section -->
+    <!-- <div class="assignment-container p-4 mb-4"> -->
+    <!---->
+    <!--     <h4 class="mb-4">Truck Assignment</h4> -->
+    <!---->
+    <!--     <div class="row g-4"> -->
+    <!---->
+    <!--         <div class="col-12"> -->
+    <!--             <div class="form-floating"> -->
+    <!--                 <label for="assigned_truck_id">Assign Truck</label> -->
+    <!--             </div> -->
+    <!---->
+    <!--             <small class="text-muted"> -->
+    <!--                 Leave this as "Assign later" if you want to schedule the load first. -->
+    <!--             </small> -->
+    <!---->
+    <!--         </div> -->
+    <!---->
+    <!--     </div> -->
+    <!---->
+    <!-- </div> -->
+    <!-- Admin Notes -->
+    <div class="notes-container p-4 mb-4">
+      <h4 class="mb-4">Admin Notes</h4>
+      <div class="form-floating">
+        {{ form.admin_notes(class="form-control", style="height: 110px", placeholder="Internal notes") }}
+        <label for="admin_notes">Internal Notes</label>
+      </div>
+      {% for error in form.admin_notes.errors %}
+        <div class="text-danger small mt-1">{{ error }}</div>
+      {% endfor %}
+    </div>
+    <div class="col-12 text-center">{{ form.submit(class="btn btn-primary btn-lg mt-3 w-50") }}</div>
+  </div>
+</form>
 </div>
-
-
-
+</div>
+</div>
 {% endblock %}

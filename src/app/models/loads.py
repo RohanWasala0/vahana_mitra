@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import ForeignKey, String, Float, Boolean, DateTime
+from sqlalchemy import ForeignKey, String, Float, Boolean, DateTime, Integer
 from datetime import datetime
 
 from app.extensions import db
@@ -35,6 +35,10 @@ class Load(db.Model):
     cost: Mapped[float | None] = mapped_column(Float, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     in_progress: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    company_info: Mapped[str | None] = mapped_column(String, nullable=True)
+    gst_no: Mapped[int] = mapped_column(Integer, nullable=True)
+    gst_filepath: Mapped[str | None] = mapped_column(String, nullable=True)
 
     @classmethod
     def find_available_loads(
